@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import KakaoMap from '../components/KakaoMap';
 
@@ -10,6 +11,7 @@ function ParentDashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [childForm, setChildForm] = useState({ name: '', age: '', busId: '', stopName: '' });
   const { socket, connected } = useSocket();
+  const { user } = useAuth();
 
   useEffect(() => {
     loadChildren();
@@ -17,19 +19,31 @@ function ParentDashboard() {
   }, []);
 
   useEffect(() => {
-    if (!socket || children.length === 0) return;
+    if (!socket || !connected || children.length === 0) return;
 
-    const busIds = [...new Set(children.map(c => c.bus_id).filter(Boolean))];
+    // 오늘 하차한 아이는 제외하고 버스 구독
+    const activeChildren = children.filter(c => c.bus_id && c.boarding_status !== '하차');
+    const busIds = [...new Set(activeChildren.map(c => c.bus_id))];
+    
+    console.log('버스 구독 시도:', busIds);
+    
+    if (busIds.length === 0) {
+      console.log('구독할 버스 없음 (모든 아이 하차 완료)');
+      return;
+    }
+    
     busIds.forEach(busId => {
+      console.log('버스 구독:', busId);
       socket.emit('parent:subscribeBus', { busId });
     });
 
     socket.on('bus:locationUpdate', (data) => {
+      console.log('위치 업데이트 수신:', data);
       setBusLocation(data);
     });
 
     socket.on('bus:tripStarted', () => {
-      loadChildren();
+      loadChildren(); // 새 운행 시작 시 다시 로드
     });
 
     socket.on('bus:tripEnded', () => {
@@ -39,12 +53,31 @@ function ParentDashboard() {
 
     socket.on('child:boarded', (data) => {
       const child = children.find(c => c.id === data.childId);
-      if (child) alert(`${child.name}이(가) 버스에 탑승했습니다.`);
+      if (child) {
+        alert(`${child.name}이(가) 버스에 탑승했습니다.`);
+        loadChildren(); // 탑승 상태 갱신
+      }
     });
 
     socket.on('child:alighted', (data) => {
       const child = children.find(c => c.id === data.childId);
-      if (child) alert(`${child.name}이(가) 버스에서 하차했습니다.`);
+      if (child) {
+        alert(`${child.name}이(가) 버스에서 하차했습니다.`);
+        loadChildren(); // 하차 상태 갱신
+        
+        // 내 아이가 하차한 경우
+        if (data.parentId === user?.id) {
+          // 모든 아이가 하차했는지 확인
+          const myActiveChildren = children.filter(c => 
+            c.bus_id === data.busId && c.id !== data.childId && c.boarding_status !== '하차'
+          );
+          
+          if (myActiveChildren.length === 0) {
+            setBusLocation(null);
+            socket.emit('parent:unsubscribeBus', { busId: data.busId });
+          }
+        }
+      }
     });
 
     socket.on('emergency:alert', (data) => {
@@ -62,7 +95,7 @@ function ParentDashboard() {
       socket.off('child:alighted');
       socket.off('emergency:alert');
     };
-  }, [socket, children]);
+  }, [socket, connected, children]);
 
   const loadChildren = async () => {
     try {

@@ -4,11 +4,15 @@ const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-// 내 아이 목록 조회 (부모용)
+// 내 아이 목록 조회 (부모용) - 현재 탑승 상태 포함
 router.get('/my', authMiddleware, roleMiddleware('parent'), async (req, res) => {
   try {
     const [children] = await db.execute(`
-      SELECT c.*, b.bus_number, b.status as bus_status
+      SELECT c.*, b.bus_number, b.status as bus_status,
+        (SELECT type FROM boarding_log 
+         WHERE child_id = c.id 
+         AND DATE(created_at) = CURDATE()
+         ORDER BY created_at DESC LIMIT 1) as boarding_status
       FROM children c
       LEFT JOIN buses b ON c.bus_id = b.id
       WHERE c.parent_id = ?
