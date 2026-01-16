@@ -77,12 +77,20 @@ function DriverDashboard() {
         },
         (error) => {
           console.error('GPS 오류:', error);
-          alert('GPS를 사용할 수 없습니다. 위치 권한을 확인해주세요.');
+          // GPS 실패 시 기본 위치 사용 (서울 시청)
+          const defaultLocation = {
+            busId: bus.id,
+            latitude: 37.5665,
+            longitude: 126.9780,
+            speed: 0
+          };
+          setCurrentLocation(defaultLocation);
+          socket.emit('driver:updateLocation', defaultLocation);
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 5000
+          maximumAge: 10000,
+          timeout: 10000
         }
       );
 
