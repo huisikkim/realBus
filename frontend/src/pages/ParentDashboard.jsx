@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSocket } from '../context/SocketContext';
 import api from '../services/api';
+import KakaoMap from '../components/KakaoMap';
 
 function ParentDashboard() {
   const [children, setChildren] = useState([]);
@@ -88,24 +89,20 @@ function ParentDashboard() {
           </span>
         </div>
 
-        <div className="map-container">
-          {busLocation ? (
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '14px', color: '#666' }}>현재 위치</p>
-              <p style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                {busLocation.latitude.toFixed(6)}, {busLocation.longitude.toFixed(6)}
-              </p>
-              <p style={{ fontSize: '13px', color: '#666', marginTop: '8px' }}>
+        {busLocation ? (
+          <>
+            <KakaoMap latitude={busLocation.latitude} longitude={busLocation.longitude} />
+            <div style={{ textAlign: 'center', marginTop: '12px' }}>
+              <p style={{ fontSize: '13px', color: '#666' }}>
                 속도: {busLocation.speed || 0} km/h
               </p>
-              <p style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
-                * Kakao Maps API 키 설정 후 지도 표시
-              </p>
             </div>
-          ) : (
+          </>
+        ) : (
+          <div className="map-container">
             <p style={{ color: '#999' }}>버스가 운행 중이 아닙니다</p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="card">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSocket } from '../context/SocketContext';
 import api from '../services/api';
+import KakaoMap from '../components/KakaoMap';
 
 function DriverDashboard() {
   const [bus, setBus] = useState(null);
@@ -144,14 +145,14 @@ function DriverDashboard() {
         </div>
 
         {currentLocation && (
-          <div style={{ background: '#f0f9ff', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}>
-            <p style={{ fontSize: '13px', color: '#0369a1' }}>
-              📍 {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
-            </p>
-            <p style={{ fontSize: '12px', color: '#0369a1' }}>
-              속도: {currentLocation.speed} km/h
-            </p>
-          </div>
+          <>
+            <KakaoMap latitude={currentLocation.latitude} longitude={currentLocation.longitude} />
+            <div style={{ textAlign: 'center', marginTop: '12px' }}>
+              <p style={{ fontSize: '13px', color: '#0369a1' }}>
+                속도: {currentLocation.speed} km/h
+              </p>
+            </div>
+          </>
         )}
 
         {!isRunning ? (
