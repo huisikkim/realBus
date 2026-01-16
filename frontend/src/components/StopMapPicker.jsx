@@ -4,9 +4,33 @@ function StopMapPicker({ latitude, longitude, onSelect }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
+  const currentMarkerRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState(null);
+
+  // 현재 위치 가져오기
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentPosition({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log('위치 권한 거부, 기본 위치 사용');
+          setCurrentPosition({ lat: 37.5665, lng: 126.9780 }); // 서울 시청
+        }
+      );
+    } else {
+      setCurrentPosition({ lat: 37.5665, lng: 126.9780 });
+    }
+  }, []);
 
   useEffect(() => {
+    if (!currentPosition) return;
+
     // 이미 카카오맵이 로드되어 있는지 확인
     if (window.kakao && window.kakao.maps) {
       initMap();
@@ -29,13 +53,14 @@ function StopMapPicker({ latitude, longitude, onSelect }) {
         script.parentNode.removeChild(script);
       }
     };
-  }, []);
+  }, [currentPosition]);
 
   const initMap = () => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !currentPosition) return;
 
-    const initialLat = latitude || 37.5665;
-    const initialLng = longitude || 126.9780;
+    // 기존 좌표가 있으면 그 위치로, 없으면 현재 위치로
+    const initialLat = latitude || currentPosition.lat;
+    const initialLng = longitude || currentPosition.lng;
 
     const options = {
       center: new window.kakao.maps.LatLng(initialLat, initialLng),
@@ -44,7 +69,20 @@ function StopMapPicker({ latitude, longitude, onSelect }) {
 
     mapInstanceRef.current = new window.kakao.maps.Map(mapRef.current, options);
 
-    // 초기 마커 (기존 좌표가 있으면)
+    // 현재 위치 마커 (파란색)
+    const currentMarkerImage = new window.kakao.maps.MarkerImage(
+      'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+      new window.kakao.maps.Size(24, 35)
+    );
+    
+    currentMarkerRef.current = new window.kakao.maps.Marker({
+      position: new window.kakao.maps.LatLng(currentPosition.lat, currentPosition.lng),
+      map: mapInstanceRef.current,
+      image: currentMarkerImage,
+      title: '현재 위치'
+    });
+
+    // 선택된 정류장 마커 (기존 좌표가 있으면)
     if (latitude && longitude) {
       markerRef.current = new window.kakao.maps.Marker({
         position: new window.kakao.maps.LatLng(latitude, longitude),
@@ -80,7 +118,6 @@ function StopMapPicker({ latitude, longitude, onSelect }) {
     if (!mapInstanceRef.current || !latitude || !longitude) return;
 
     const newPosition = new window.kakao.maps.LatLng(latitude, longitude);
-    mapInstanceRef.current.setCenter(newPosition);
 
     if (markerRef.current) {
       markerRef.current.setPosition(newPosition);
@@ -117,11 +154,11 @@ function StopMapPicker({ latitude, longitude, onSelect }) {
           background: '#f0f0f0',
           borderRadius: '8px'
         }}>
-          지도 로딩 중...
+          {currentPosition ? '지도 로딩 중...' : '현재 위치 확인 중...'}
         </div>
       )}
       <p style={{ fontSize: '12px', color: '#666', textAlign: 'center' }}>
-        🗺️ 지도를 클릭하여 정류장 위치를 선택하세요
+        🗺️ 지도를 클릭하여 정류장 위치를 선택하세요 (⭐ 현재 위치)
       </p>
     </div>
   );
