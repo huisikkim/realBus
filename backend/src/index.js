@@ -6,6 +6,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const busRoutes = require('./routes/bus');
 const childRoutes = require('./routes/child');
+const adminRoutes = require('./routes/admin');
 const { initSocket } = require('./socket');
 const db = require('./config/database');
 
@@ -32,6 +33,7 @@ initSocket(io);
 app.use('/api/auth', authRoutes);
 app.use('/api/bus', busRoutes);
 app.use('/api/child', childRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 헬스 체크
 app.get('/health', (req, res) => {

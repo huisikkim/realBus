@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ParentDashboard from './pages/ParentDashboard';
 import DriverDashboard from './pages/DriverDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import Layout from './components/Layout';
 
 function App() {
@@ -18,6 +19,14 @@ function App() {
     );
   }
 
+  const getDashboard = () => {
+    switch (user?.role) {
+      case 'admin': return <AdminDashboard />;
+      case 'driver': return <DriverDashboard />;
+      default: return <ParentDashboard />;
+    }
+  };
+
   return (
     <Routes>
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
@@ -28,12 +37,7 @@ function App() {
           user ? (
             <Layout>
               <Routes>
-                <Route
-                  path="/"
-                  element={
-                    user.role === 'driver' ? <DriverDashboard /> : <ParentDashboard />
-                  }
-                />
+                <Route path="/" element={getDashboard()} />
               </Routes>
             </Layout>
           ) : (
