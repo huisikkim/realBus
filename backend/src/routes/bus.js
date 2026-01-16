@@ -11,7 +11,7 @@ router.get('/', authMiddleware, async (req, res) => {
     const [buses] = await db.execute(`
       SELECT b.*, u.name as driver_name 
       FROM buses b 
-      LEFT JOIN users u ON b.driver_id = u.id
+      LEFT JOIN shuttle_users u ON b.driver_id = u.id
     `);
 
     // 실시간 위치 정보 추가
@@ -33,7 +33,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     const [buses] = await db.execute(`
       SELECT b.*, u.name as driver_name, u.phone as driver_phone
       FROM buses b 
-      LEFT JOIN users u ON b.driver_id = u.id
+      LEFT JOIN shuttle_users u ON b.driver_id = u.id
       WHERE b.id = ?
     `, [req.params.id]);
 
@@ -89,7 +89,7 @@ router.get('/:id/children', authMiddleware, async (req, res) => {
     const [children] = await db.execute(`
       SELECT c.*, u.name as parent_name, u.phone as parent_phone
       FROM children c
-      JOIN users u ON c.parent_id = u.id
+      JOIN shuttle_users u ON c.parent_id = u.id
       WHERE c.bus_id = ?
     `, [req.params.id]);
 

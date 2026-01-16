@@ -1,10 +1,7 @@
 -- 셔틀버스 안전 서비스 DB 스키마
 
-CREATE DATABASE IF NOT EXISTS shuttle_bus CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE shuttle_bus;
-
 -- 사용자 테이블
-CREATE TABLE users (
+CREATE TABLE shuttle_users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
@@ -23,7 +20,7 @@ CREATE TABLE buses (
   status ENUM('대기', '운행중') DEFAULT '대기',
   current_trip_start TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (driver_id) REFERENCES users(id)
+  FOREIGN KEY (driver_id) REFERENCES shuttle_users(id)
 );
 
 -- 아이 테이블
@@ -35,7 +32,7 @@ CREATE TABLE children (
   bus_id INT,
   stop_name VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (parent_id) REFERENCES users(id),
+  FOREIGN KEY (parent_id) REFERENCES shuttle_users(id),
   FOREIGN KEY (bus_id) REFERENCES buses(id)
 );
 
@@ -71,5 +68,5 @@ CREATE TABLE emergency_log (
   message TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (bus_id) REFERENCES buses(id),
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES shuttle_users(id)
 );

@@ -11,7 +11,7 @@ router.post('/register', async (req, res) => {
     const { email, password, name, phone, role } = req.body;
 
     // 이메일 중복 체크
-    const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
+    const [existing] = await db.execute('SELECT id FROM shuttle_users WHERE email = ?', [email]);
     if (existing.length > 0) {
       return res.status(400).json({ error: '이미 등록된 이메일입니다' });
     }
@@ -21,7 +21,7 @@ router.post('/register', async (req, res) => {
 
     // 사용자 생성
     const [result] = await db.execute(
-      'INSERT INTO users (email, password, name, phone, role) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO shuttle_users (email, password, name, phone, role) VALUES (?, ?, ?, ?, ?)',
       [email, hashedPassword, name, phone, role || 'parent']
     );
 
@@ -37,7 +37,7 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    const [users] = await db.execute('SELECT * FROM shuttle_users WHERE email = ?', [email]);
     if (users.length === 0) {
       return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다' });
     }
