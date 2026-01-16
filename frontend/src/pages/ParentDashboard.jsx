@@ -57,13 +57,15 @@ function ParentDashboard() {
   useEffect(() => {
     if (!socket || !connected || children.length === 0) return;
 
-    const activeChildren = children.filter(c => c.bus_id && c.boarding_status !== '하차');
-    const busIds = [...new Set(activeChildren.map(c => c.bus_id))];
+    // 버스가 배정된 모든 아이의 버스를 구독 (하차 완료된 경우만 제외)
+    const childrenWithBus = children.filter(c => c.bus_id);
+    const busIds = [...new Set(childrenWithBus.map(c => c.bus_id))];
     
+    console.log('아이 목록:', children);
     console.log('버스 구독 시도:', busIds);
     
     if (busIds.length === 0) {
-      console.log('구독할 버스 없음 (모든 아이 하차 완료)');
+      console.log('구독할 버스 없음 (버스 미배정)');
       return;
     }
     
@@ -77,11 +79,13 @@ function ParentDashboard() {
       setBusLocation(data);
     });
 
-    socket.on('bus:tripStarted', () => {
+    socket.on('bus:tripStarted', (data) => {
+      console.log('운행 시작:', data);
       loadChildren();
     });
 
-    socket.on('bus:tripEnded', () => {
+    socket.on('bus:tripEnded', (data) => {
+      console.log('운행 종료:', data);
       setBusLocation(null);
       loadChildren();
     });
@@ -99,17 +103,6 @@ function ParentDashboard() {
       if (child) {
         alert(`${child.name}이(가) 버스에서 하차했습니다.`);
         loadChildren();
-        
-        if (data.parentId === user?.id) {
-          const myActiveChildren = children.filter(c => 
-            c.bus_id === data.busId && c.id !== data.childId && c.boarding_status !== '하차'
-          );
-          
-          if (myActiveChildren.length === 0) {
-            setBusLocation(null);
-            socket.emit('parent:unsubscribeBus', { busId: data.busId });
-          }
-        }
       }
     });
 
@@ -128,7 +121,7 @@ function ParentDashboard() {
       socket.off('child:alighted');
       socket.off('emergency:alert');
     };
-  }, [socket, connected, children]);
+  }, [socket, connected, children.length]); // children.length로 변경하여 무한 루프 방지
 
   const loadChildren = async () => {
     try {
