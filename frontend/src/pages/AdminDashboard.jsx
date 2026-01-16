@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import StopMapPicker from '../components/StopMapPicker';
 
 function AdminDashboard() {
   const [tab, setTab] = useState('buses');
@@ -375,9 +376,16 @@ function AdminDashboard() {
       )}
 
       {showStopModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '16px' }}>
+          <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ marginBottom: '16px' }}>{editingStop ? '정류장 수정' : '정류장 추가'}</h3>
+            
+            <StopMapPicker
+              latitude={stopForm.latitude ? parseFloat(stopForm.latitude) : null}
+              longitude={stopForm.longitude ? parseFloat(stopForm.longitude) : null}
+              onSelect={(lat, lng) => setStopForm({ ...stopForm, latitude: lat.toFixed(8), longitude: lng.toFixed(8) })}
+            />
+
             <select
               className="input"
               value={stopForm.busId}
@@ -395,22 +403,26 @@ function AdminDashboard() {
               value={stopForm.name}
               onChange={(e) => setStopForm({ ...stopForm, name: e.target.value })}
             />
-            <input
-              className="input"
-              type="number"
-              step="any"
-              placeholder="위도 (예: 37.5665)"
-              value={stopForm.latitude}
-              onChange={(e) => setStopForm({ ...stopForm, latitude: e.target.value })}
-            />
-            <input
-              className="input"
-              type="number"
-              step="any"
-              placeholder="경도 (예: 126.9780)"
-              value={stopForm.longitude}
-              onChange={(e) => setStopForm({ ...stopForm, longitude: e.target.value })}
-            />
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                className="input"
+                type="number"
+                step="any"
+                placeholder="위도"
+                value={stopForm.latitude}
+                onChange={(e) => setStopForm({ ...stopForm, latitude: e.target.value })}
+                style={{ flex: 1 }}
+              />
+              <input
+                className="input"
+                type="number"
+                step="any"
+                placeholder="경도"
+                value={stopForm.longitude}
+                onChange={(e) => setStopForm({ ...stopForm, longitude: e.target.value })}
+                style={{ flex: 1 }}
+              />
+            </div>
             <input
               className="input"
               type="number"
@@ -418,10 +430,7 @@ function AdminDashboard() {
               value={stopForm.stopOrder}
               onChange={(e) => setStopForm({ ...stopForm, stopOrder: parseInt(e.target.value) || 0 })}
             />
-            <p style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
-              💡 위도/경도는 카카오맵에서 위치를 클릭하면 확인할 수 있어요
-            </p>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
               <button className="btn" style={{ background: '#e5e5e5' }} onClick={() => setShowStopModal(false)}>취소</button>
               <button className="btn btn-primary" onClick={saveStop}>저장</button>
             </div>
