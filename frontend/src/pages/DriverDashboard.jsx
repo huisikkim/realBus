@@ -62,7 +62,6 @@ function DriverDashboard() {
   const startTrip = () => {
     if (!bus || !socket) return;
 
-    // GPS 추적 시작
     if ('geolocation' in navigator) {
       watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
@@ -77,7 +76,6 @@ function DriverDashboard() {
         },
         (error) => {
           console.error('GPS 오류:', error);
-          // GPS 실패 시 기본 위치 사용 (서울 시청)
           const defaultLocation = {
             busId: bus.id,
             latitude: 37.5665,
@@ -128,109 +126,155 @@ function DriverDashboard() {
 
   if (!bus) {
     return (
-      <div className="container">
-        <div className="card text-center" style={{ padding: '40px' }}>
-          <p style={{ color: '#666' }}>배정된 버스가 없습니다.</p>
-          <p style={{ color: '#999', fontSize: '14px', marginTop: '8px' }}>
-            관리자에게 문의해주세요.
-          </p>
-        </div>
-      </div>
+      <main className="max-w-5xl mx-auto p-10">
+        <section className="bg-white rounded-large shadow-sm border border-slate-200 p-8">
+          <div className="text-center py-16">
+            <span className="material-symbols-outlined text-6xl text-slate-300 mb-4">directions_bus</span>
+            <p className="text-slate-500 font-semibold text-lg">배정된 버스가 없습니다.</p>
+            <p className="text-slate-400 text-sm mt-2">관리자에게 문의해주세요.</p>
+          </div>
+        </section>
+      </main>
     );
   }
 
   return (
-    <div className="container">
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div>
-            <h2 style={{ fontSize: '20px' }}>{bus.bus_number}호 버스</h2>
-            <p style={{ color: '#666', fontSize: '14px' }}>정원: {bus.capacity}명</p>
-          </div>
-          <span className={`status-badge ${isRunning ? 'status-running' : 'status-waiting'}`}>
-            {isRunning ? '운행중' : '대기'}
-          </span>
-        </div>
-
-        {currentLocation && (
-          <>
-            <KakaoMap latitude={currentLocation.latitude} longitude={currentLocation.longitude} />
-            <div style={{ textAlign: 'center', marginTop: '12px' }}>
-              <p style={{ fontSize: '13px', color: '#0369a1' }}>
-                속도: {currentLocation.speed} km/h
+    <main className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
+      {/* 버스 정보 & 지도 섹션 */}
+      <section className="bg-white rounded-large shadow-sm border border-slate-200 overflow-hidden">
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h2 className="text-2xl md:text-3xl font-extrabold text-navy">{bus.bus_number}호 버스</h2>
+                <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide border ${
+                  isRunning 
+                    ? 'bg-emerald-50 text-safe-green border-emerald-100' 
+                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                }`}>
+                  {isRunning ? 'Running' : 'Standby'}
+                </span>
+              </div>
+              <p className="text-slate-500 font-semibold text-sm">최대 정원: {bus.capacity}명 | 현재 탑승: {children.length}명</p>
+            </div>
+            <div className="text-left md:text-right">
+              <p className="text-slate-400 text-xs font-bold mb-1 uppercase tracking-widest">Current Speed</p>
+              <p className="text-3xl md:text-4xl font-black text-navy">
+                {currentLocation?.speed || 0} <span className="text-lg font-bold text-slate-400">km/h</span>
               </p>
             </div>
-          </>
-        )}
+          </div>
 
-        {!isRunning ? (
-          <button className="btn btn-success" onClick={startTrip}>
-            🚌 운행 시작
-          </button>
-        ) : (
-          <button className="btn btn-danger" onClick={endTrip}>
-            운행 종료
-          </button>
-        )}
-      </div>
+          {/* 지도 */}
+          <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden mb-8 border border-slate-200 shadow-inner">
+            {currentLocation ? (
+              <KakaoMap latitude={currentLocation.latitude} longitude={currentLocation.longitude} />
+            ) : (
+              <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                <div className="text-center">
+                  <span className="material-symbols-outlined text-5xl text-slate-300 mb-2">map</span>
+                  <p className="text-slate-400 font-medium">운행을 시작하면 지도가 표시됩니다</p>
+                </div>
+              </div>
+            )}
+            {currentLocation && (
+              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg text-xs font-bold border border-slate-200 shadow-sm flex items-center gap-2">
+                <span className="w-2 h-2 bg-safe-green rounded-full animate-pulse"></span>
+                GPS Active | Kakao Map
+              </div>
+            )}
+          </div>
 
-      <div className="card">
-        <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>
-          탑승 아이 목록 ({children.length}명)
-        </h2>
+          {/* 운행 버튼 */}
+          <div className="flex justify-center">
+            {!isRunning ? (
+              <button 
+                onClick={startTrip}
+                className="w-full max-w-md bg-safe-green hover:bg-emerald-600 text-white py-4 md:py-5 rounded-xl font-extrabold text-lg md:text-xl transition-all shadow-lg shadow-emerald-100 active:scale-[0.99] flex items-center justify-center gap-3"
+              >
+                <span className="material-symbols-outlined font-bold text-2xl">play_circle</span>
+                운행 시작
+              </button>
+            ) : (
+              <button 
+                onClick={endTrip}
+                className="w-full max-w-md bg-rose-400 hover:bg-rose-500 text-white py-4 md:py-5 rounded-xl font-extrabold text-lg md:text-xl transition-all shadow-lg shadow-rose-100 active:scale-[0.99] flex items-center justify-center gap-3"
+              >
+                <span className="material-symbols-outlined font-bold text-2xl">stop_circle</span>
+                운행 종료
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* 탑승 어린이 섹션 */}
+      <section className="bg-white rounded-large shadow-sm border border-slate-200 p-6 md:p-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2 mb-8">
+          <div>
+            <h3 className="text-xl md:text-2xl font-extrabold text-navy">탑승 어린이 목록</h3>
+            <p className="text-slate-500 font-medium text-sm">실시간 탑승 및 하차 상태를 관리하세요.</p>
+          </div>
+          <span className="text-slate-400 text-sm font-bold">총 {children.length}명</span>
+        </div>
 
         {children.length === 0 ? (
-          <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>
-            등록된 아이가 없습니다
-          </p>
+          <div className="text-center py-12">
+            <span className="material-symbols-outlined text-5xl text-slate-300 mb-2">child_care</span>
+            <p className="text-slate-400 font-medium">등록된 어린이가 없습니다</p>
+          </div>
         ) : (
-          children.map(child => (
-            <div key={child.id} className="child-card" style={{ flexWrap: 'wrap' }}>
-              <div className="child-avatar">
-                {child.name.charAt(0)}
-              </div>
-              <div className="child-info" style={{ flex: 1 }}>
-                <h3>{child.name}</h3>
-                <p>{child.stop_name || '정류장 미지정'}</p>
-                <p style={{ fontSize: '12px' }}>보호자: {child.parent_name} ({child.parent_phone})</p>
-              </div>
-              {isRunning && (
-                <div style={{ display: 'flex', gap: '8px', width: '100%', marginTop: '8px' }}>
-                  <button
-                    className="btn btn-success"
-                    style={{ flex: 1, padding: '10px' }}
-                    onClick={() => handleBoarding(child.id, 'board')}
-                  >
-                    승차
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    style={{ flex: 1, padding: '10px' }}
-                    onClick={() => handleBoarding(child.id, 'alight')}
-                  >
-                    하차
-                  </button>
+          <div className="space-y-4">
+            {children.map(child => (
+              <div key={child.id} className="bg-slate-50 rounded-2xl p-4 md:p-6 border border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:border-slate-200 transition-all">
+                <div className="flex items-center gap-4 md:gap-6">
+                  <div className="w-14 h-14 md:w-20 md:h-20 bg-navy text-white rounded-2xl flex items-center justify-center text-xl md:text-3xl font-black shadow-md">
+                    {child.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-lg md:text-2xl font-extrabold text-navy">{child.name}</h4>
+                      {child.stop_name && (
+                        <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">{child.stop_name}</span>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 text-slate-500 font-semibold text-sm">
+                        <span className="material-symbols-outlined text-base">person</span>
+                        보호자: {child.parent_name}
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-400 font-medium text-sm">
+                        <span className="material-symbols-outlined text-base">call</span>
+                        {child.parent_phone || '연락처 없음'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))
+                
+                {isRunning && (
+                  <div className="flex gap-3 w-full md:w-auto">
+                    <button 
+                      onClick={() => handleBoarding(child.id, 'board')}
+                      className="flex-1 md:flex-none bg-white hover:bg-emerald-50 text-safe-green border-2 border-emerald-500 px-4 md:px-8 py-3 md:py-4 rounded-xl font-bold md:font-black text-base md:text-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-xl md:text-2xl font-bold">login</span>
+                      승차
+                    </button>
+                    <button 
+                      onClick={() => handleBoarding(child.id, 'alight')}
+                      className="flex-1 md:flex-none bg-navy hover:bg-navy-dark text-white border-2 border-navy px-4 md:px-8 py-3 md:py-4 rounded-xl font-bold md:font-black text-base md:text-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md shadow-navy/10"
+                    >
+                      <span className="material-symbols-outlined text-xl md:text-2xl font-bold">logout</span>
+                      하차
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         )}
-      </div>
-
-      <button 
-        className="emergency-btn"
-        onClick={() => {
-          if (confirm('비상 알림을 모든 부모에게 보내시겠습니까?')) {
-            if (socket) {
-              socket.emit('emergency', { busId: bus.id, message: '기사 비상 호출' });
-              alert('비상 알림이 전송되었습니다.');
-            }
-          }
-        }}
-      >
-        🚨
-      </button>
-    </div>
+      </section>
+    </main>
   );
 }
 
