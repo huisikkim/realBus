@@ -106,10 +106,11 @@ router.get('/drivers', async (req, res) => {
 router.get('/children', async (req, res) => {
   try {
     const [children] = await db.execute(`
-      SELECT c.*, u.name as parent_name, u.phone as parent_phone, b.bus_number
+      SELECT c.*, u.name as parent_name, u.phone as parent_phone, b.bus_number, s.name as stop_name
       FROM children c
       JOIN shuttle_users u ON c.parent_id = u.id
       LEFT JOIN buses b ON c.bus_id = b.id
+      LEFT JOIN stops s ON c.stop_id = s.id
       ORDER BY c.created_at DESC
     `);
     res.json(children);
@@ -123,10 +124,38 @@ router.get('/children', async (req, res) => {
 router.put('/children/:id/bus', async (req, res) => {
   try {
     const { busId } = req.body;
-    await db.execute('UPDATE children SET bus_id = ? WHERE id = ?', [busId || null, req.params.id]);
+    await db.execute('UPDATE children SET bus_id = ?, stop_id = NULL WHERE id = ?', [busId || null, req.params.id]);
     res.json({ message: '버스 배정 완료' });
   } catch (err) {
     console.error('버스 배정 오류:', err);
+    res.status(500).json({ error: '서버 오류' });
+  }
+});
+
+// 아이 정류장 배정
+router.put('/children/:id/stop', async (req, res) => {
+  try {
+    const { stopId } = req.body;
+    await db.execute('UPDATE children SET stop_id = ? WHERE id = ?', [stopId || null, req.params.id]);
+    res.json({ message: '정류장 배정 완료' });
+  } catch (err) {
+    console.error('정류장 배정 오류:', err);
+    res.status(500).json({ error: '서버 오류' });
+  }
+});
+
+// 전체 정류장 목록
+router.get('/stops', async (req, res) => {
+  try {
+    const [stops] = await db.execute(`
+      SELECT s.*, b.bus_number
+      FROM stops s
+      JOIN buses b ON s.bus_id = b.id
+      ORDER BY b.bus_number, s.stop_order
+    `);
+    res.json(stops);
+  } catch (err) {
+    console.error('정류장 목록 조회 오류:', err);
     res.status(500).json({ error: '서버 오류' });
   }
 });

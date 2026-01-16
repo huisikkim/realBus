@@ -7,9 +7,15 @@ function AdminDashboard() {
   const [buses, setBuses] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [children, setChildren] = useState([]);
+  const [stops, setStops] = useState([]);
+  const [allStops, setAllStops] = useState([]);
   const [showBusModal, setShowBusModal] = useState(false);
+  const [showStopModal, setShowStopModal] = useState(false);
   const [editingBus, setEditingBus] = useState(null);
+  const [editingStop, setEditingStop] = useState(null);
   const [busForm, setBusForm] = useState({ busNumber: '', driverId: '', capacity: 15 });
+  const [stopForm, setStopForm] = useState({ busId: '', name: '', latitude: '', longitude: '', stopOrder: 0 });
+  const [selectedBusForStops, setSelectedBusForStops] = useState('');
 
   useEffect(() => {
     loadData();
@@ -17,18 +23,35 @@ function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [usersRes, busesRes, driversRes, childrenRes] = await Promise.all([
+      const [usersRes, busesRes, driversRes, childrenRes, stopsRes] = await Promise.all([
         api.get('/admin/users'),
         api.get('/admin/buses'),
         api.get('/admin/drivers'),
-        api.get('/admin/children')
+        api.get('/admin/children'),
+        api.get('/admin/stops')
       ]);
       setUsers(usersRes.data);
       setBuses(busesRes.data);
       setDrivers(driversRes.data);
       setChildren(childrenRes.data);
+      setAllStops(stopsRes.data);
     } catch (err) {
       console.error('데이터 로드 실패:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedBusForStops) {
+      loadBusStops(selectedBusForStops);
+    }
+  }, [selectedBusForStops]);
+
+  const loadBusStops = async (busId) => {
+    try {
+      const res = await api.get(`/stop/bus/${busId}`);
+      setStops(res.data);
+    } catch (err) {
+      console.error('정류장 로드 실패:', err);
     }
   };
 
@@ -76,6 +99,60 @@ function AdminDashboard() {
     }
   };
 
+  // 정류장 관련 함수
+  const openStopModal = (stop = null) => {
+    if (stop) {
+      setEditingStop(stop);
+      setStopForm({
+        busId: stop.bus_id,
+        name: stop.name,
+        latitude: stop.latitude,
+        longitude: stop.longitude,
+        stopOrder: stop.stop_order
+      });
+    } else {
+      setEditingStop(null);
+      setStopForm({
+        busId: selectedBusForStops || '',
+        name: '',
+        latitude: '',
+        longitude: '',
+        stopOrder: stops.length
+      });
+    }
+    setShowStopModal(true);
+  };
+
+  const saveStop = async () => {
+    if (!stopForm.busId || !stopForm.name || !stopForm.latitude || !stopForm.longitude) {
+      alert('모든 필드를 입력해주세요');
+      return;
+    }
+    try {
+      if (editingStop) {
+        await api.put(`/stop/${editingStop.id}`, stopForm);
+      } else {
+        await api.post('/stop', stopForm);
+      }
+      setShowStopModal(false);
+      loadData();
+      if (selectedBusForStops) loadBusStops(selectedBusForStops);
+    } catch (err) {
+      alert('저장 실패');
+    }
+  };
+
+  const deleteStop = async (id) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      await api.delete(`/stop/${id}`);
+      loadData();
+      if (selectedBusForStops) loadBusStops(selectedBusForStops);
+    } catch (err) {
+      alert('삭제 실패');
+    }
+  };
+
   const assignChildBus = async (childId, busId) => {
     try {
       await api.put(`/admin/children/${childId}/bus`, { busId: busId || null });
@@ -85,18 +162,27 @@ function AdminDashboard() {
     }
   };
 
+  const assignChildStop = async (childId, stopId) => {
+    try {
+      await api.put(`/admin/children/${childId}/stop`, { stopId: stopId || null });
+      loadData();
+    } catch (err) {
+      alert('정류장 배정 실패');
+    }
+  };
+
   return (
     <div className="container">
       <div className="card">
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-          {['buses', 'users', 'children'].map(t => (
+          {['buses', 'stops', 'users', 'children'].map(t => (
             <button
               key={t}
               className={`btn ${tab === t ? 'btn-primary' : ''}`}
               style={{ flex: 1, padding: '10px', background: tab === t ? '#4F46E5' : '#e5e5e5', color: tab === t ? 'white' : '#333' }}
               onClick={() => setTab(t)}
             >
-              {t === 'buses' ? '버스 관리' : t === 'users' ? '사용자 관리' : '아이 관리'}
+              {t === 'buses' ? '버스 관리' : t === 'stops' ? '정류장 관리' : t === 'users' ? '사용자 관리' : '아이 관리'}
             </button>
           ))}
         </div>
@@ -166,21 +252,86 @@ function AdminDashboard() {
           ) : (
             children.map(child => (
               <div key={child.id} style={{ background: '#f9f9f9', padding: '12px', borderRadius: '8px', marginBottom: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <div>
                     <strong>{child.name}</strong> ({child.age}세)
                     <p style={{ fontSize: '13px', color: '#666' }}>보호자: {child.parent_name}</p>
+                    {child.stop_name && <p style={{ fontSize: '12px', color: '#888' }}>정류장: {child.stop_name}</p>}
                   </div>
-                  <select
-                    value={child.bus_id || ''}
-                    onChange={(e) => assignChildBus(child.id, e.target.value)}
-                    style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ddd' }}
-                  >
-                    <option value="">버스 미배정</option>
-                    {buses.map(bus => (
-                      <option key={bus.id} value={bus.id}>{bus.bus_number}호</option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <select
+                      value={child.bus_id || ''}
+                      onChange={(e) => assignChildBus(child.id, e.target.value)}
+                      style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    >
+                      <option value="">버스 미배정</option>
+                      {buses.map(bus => (
+                        <option key={bus.id} value={bus.id}>{bus.bus_number}호</option>
+                      ))}
+                    </select>
+                    <select
+                      value={child.stop_id || ''}
+                      onChange={(e) => assignChildStop(child.id, e.target.value)}
+                      style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ddd' }}
+                      disabled={!child.bus_id}
+                    >
+                      <option value="">정류장 미배정</option>
+                      {allStops.filter(s => s.bus_id === child.bus_id).map(stop => (
+                        <option key={stop.id} value={stop.id}>{stop.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {tab === 'stops' && (
+        <div className="card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+            <h2 style={{ fontSize: '18px' }}>정류장 관리</h2>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <select
+                value={selectedBusForStops}
+                onChange={(e) => setSelectedBusForStops(e.target.value)}
+                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+              >
+                <option value="">버스 선택</option>
+                {buses.map(bus => (
+                  <option key={bus.id} value={bus.id}>{bus.bus_number}호 버스</option>
+                ))}
+              </select>
+              <button 
+                className="btn btn-primary" 
+                style={{ width: 'auto', padding: '8px 16px' }} 
+                onClick={() => openStopModal()}
+                disabled={!selectedBusForStops}
+              >
+                + 정류장 추가
+              </button>
+            </div>
+          </div>
+          
+          {!selectedBusForStops ? (
+            <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>버스를 선택해주세요</p>
+          ) : stops.length === 0 ? (
+            <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>등록된 정류장이 없습니다</p>
+          ) : (
+            stops.map((stop, index) => (
+              <div key={stop.id} style={{ background: '#f9f9f9', padding: '12px', borderRadius: '8px', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <strong>{index + 1}. {stop.name}</strong>
+                    <p style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>
+                      위치: {stop.latitude}, {stop.longitude}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => openStopModal(stop)} style={{ padding: '6px 12px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: 'pointer' }}>수정</button>
+                    <button onClick={() => deleteStop(stop.id)} style={{ padding: '6px 12px', border: 'none', borderRadius: '4px', background: '#EF4444', color: 'white', cursor: 'pointer' }}>삭제</button>
+                  </div>
                 </div>
               </div>
             ))
@@ -218,6 +369,61 @@ function AdminDashboard() {
             <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
               <button className="btn" style={{ background: '#e5e5e5' }} onClick={() => setShowBusModal(false)}>취소</button>
               <button className="btn btn-primary" onClick={saveBus}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showStopModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
+            <h3 style={{ marginBottom: '16px' }}>{editingStop ? '정류장 수정' : '정류장 추가'}</h3>
+            <select
+              className="input"
+              value={stopForm.busId}
+              onChange={(e) => setStopForm({ ...stopForm, busId: e.target.value })}
+              disabled={editingStop}
+            >
+              <option value="">버스 선택</option>
+              {buses.map(bus => (
+                <option key={bus.id} value={bus.id}>{bus.bus_number}호 버스</option>
+              ))}
+            </select>
+            <input
+              className="input"
+              placeholder="정류장 이름 (예: OO아파트 앞)"
+              value={stopForm.name}
+              onChange={(e) => setStopForm({ ...stopForm, name: e.target.value })}
+            />
+            <input
+              className="input"
+              type="number"
+              step="any"
+              placeholder="위도 (예: 37.5665)"
+              value={stopForm.latitude}
+              onChange={(e) => setStopForm({ ...stopForm, latitude: e.target.value })}
+            />
+            <input
+              className="input"
+              type="number"
+              step="any"
+              placeholder="경도 (예: 126.9780)"
+              value={stopForm.longitude}
+              onChange={(e) => setStopForm({ ...stopForm, longitude: e.target.value })}
+            />
+            <input
+              className="input"
+              type="number"
+              placeholder="순서"
+              value={stopForm.stopOrder}
+              onChange={(e) => setStopForm({ ...stopForm, stopOrder: parseInt(e.target.value) || 0 })}
+            />
+            <p style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+              💡 위도/경도는 카카오맵에서 위치를 클릭하면 확인할 수 있어요
+            </p>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+              <button className="btn" style={{ background: '#e5e5e5' }} onClick={() => setShowStopModal(false)}>취소</button>
+              <button className="btn btn-primary" onClick={saveStop}>저장</button>
             </div>
           </div>
         </div>

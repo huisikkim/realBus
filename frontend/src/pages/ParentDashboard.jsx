@@ -8,8 +8,10 @@ function ParentDashboard() {
   const [children, setChildren] = useState([]);
   const [buses, setBuses] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
+  const [etaData, setEtaData] = useState({});
   const [showAddModal, setShowAddModal] = useState(false);
-  const [childForm, setChildForm] = useState({ name: '', age: '', busId: '', stopName: '' });
+  const [childForm, setChildForm] = useState({ name: '', age: '', busId: '', stopId: '' });
+  const [stops, setStops] = useState([]);
   const { socket, connected } = useSocket();
   const { user } = useAuth();
 
@@ -17,6 +19,40 @@ function ParentDashboard() {
     loadChildren();
     loadBuses();
   }, []);
+
+  // ETA 주기적 업데이트
+  useEffect(() => {
+    if (children.length === 0 || !busLocation) return;
+
+    const fetchEta = async () => {
+      const etaResults = {};
+      for (const child of children) {
+        if (child.bus_id && child.stop_id) {
+          try {
+            const res = await api.get(`/eta/child/${child.id}`);
+            etaResults[child.id] = res.data;
+          } catch (err) {
+            console.error('ETA 조회 실패:', err);
+          }
+        }
+      }
+      setEtaData(etaResults);
+    };
+
+    fetchEta();
+    const interval = setInterval(fetchEta, 30000); // 30초마다 갱신
+
+    return () => clearInterval(interval);
+  }, [children, busLocation]);
+
+  // 버스 선택 시 해당 버스의 정류장 로드
+  useEffect(() => {
+    if (childForm.busId) {
+      loadStops(childForm.busId);
+    } else {
+      setStops([]);
+    }
+  }, [childForm.busId]);
 
   useEffect(() => {
     if (!socket || !connected || children.length === 0) return;
@@ -112,6 +148,15 @@ function ParentDashboard() {
     }
   };
 
+  const loadStops = async (busId) => {
+    try {
+      const res = await api.get(`/stop/bus/${busId}`);
+      setStops(res.data);
+    } catch (err) {
+      console.error('정류장 목록 로드 실패:', err);
+    }
+  };
+
   const handleAddChild = async () => {
     if (!childForm.name || !childForm.age) {
       alert('이름과 나이를 입력해주세요');
@@ -122,10 +167,10 @@ function ParentDashboard() {
         name: childForm.name,
         age: parseInt(childForm.age),
         busId: childForm.busId || null,
-        stopName: childForm.stopName || null
+        stopId: childForm.stopId || null
       });
       setShowAddModal(false);
-      setChildForm({ name: '', age: '', busId: '', stopName: '' });
+      setChildForm({ name: '', age: '', busId: '', stopId: '' });
       loadChildren();
     } catch (err) {
       alert('등록 실패');
@@ -212,6 +257,18 @@ function ParentDashboard() {
                     {child.bus_number ? `${child.bus_number}호 버스` : '버스 미배정'}
                     {child.stop_name && ` · ${child.stop_name}`}
                   </p>
+                  {/* ETA 표시 */}
+                  {etaData[child.id]?.eta && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-base text-amber-500">schedule</span>
+                      <span className="text-amber-600 font-bold text-sm">
+                        약 {etaData[child.id].eta}분 후 도착 예정
+                      </span>
+                      <span className="text-slate-400 text-xs">
+                        ({(etaData[child.id].distance / 1000).toFixed(1)}km)
+                      </span>
+                    </div>
+                  )}
                 </div>
                 {child.bus_status && (
                   <span className={`px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0 ${
@@ -277,14 +334,18 @@ function ParentDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">정류장 이름</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none transition-all font-medium"
-                  placeholder="정류장 이름 (선택사항)"
-                  value={childForm.stopName}
-                  onChange={(e) => setChildForm({ ...childForm, stopName: e.target.value })}
-                />
+                <label className="block text-sm font-bold text-slate-600 mb-1.5">정류장 선택</label>
+                <select
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none transition-all font-medium bg-white"
+                  value={childForm.stopId}
+                  onChange={(e) => setChildForm({ ...childForm, stopId: e.target.value })}
+                  disabled={!childForm.busId}
+                >
+                  <option value="">{childForm.busId ? '정류장을 선택하세요' : '버스를 먼저 선택하세요'}</option>
+                  {stops.map(stop => (
+                    <option key={stop.id} value={stop.id}>{stop.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

@@ -8,13 +8,14 @@ const router = express.Router();
 router.get('/my', authMiddleware, roleMiddleware('parent'), async (req, res) => {
   try {
     const [children] = await db.execute(`
-      SELECT c.*, b.bus_number, b.status as bus_status,
+      SELECT c.*, b.bus_number, b.status as bus_status, s.name as stop_name,
         (SELECT type FROM boarding_log 
          WHERE child_id = c.id 
          AND DATE(created_at) = CURDATE()
          ORDER BY created_at DESC LIMIT 1) as boarding_status
       FROM children c
       LEFT JOIN buses b ON c.bus_id = b.id
+      LEFT JOIN stops s ON c.stop_id = s.id
       WHERE c.parent_id = ?
     `, [req.user.id]);
 
@@ -28,11 +29,11 @@ router.get('/my', authMiddleware, roleMiddleware('parent'), async (req, res) => 
 // 아이 등록
 router.post('/', authMiddleware, roleMiddleware('parent'), async (req, res) => {
   try {
-    const { name, age, busId, stopName } = req.body;
+    const { name, age, busId, stopId } = req.body;
 
     const [result] = await db.execute(
-      'INSERT INTO children (parent_id, name, age, bus_id, stop_name) VALUES (?, ?, ?, ?, ?)',
-      [req.user.id, name, age, busId, stopName]
+      'INSERT INTO children (parent_id, name, age, bus_id, stop_id) VALUES (?, ?, ?, ?, ?)',
+      [req.user.id, name, age, busId || null, stopId || null]
     );
 
     res.status(201).json({ message: '아이 등록 완료', childId: result.insertId });
@@ -45,7 +46,7 @@ router.post('/', authMiddleware, roleMiddleware('parent'), async (req, res) => {
 // 아이 정보 수정
 router.put('/:id', authMiddleware, roleMiddleware('parent'), async (req, res) => {
   try {
-    const { name, age, busId, stopName } = req.body;
+    const { name, age, busId, stopId } = req.body;
 
     // 본인 아이인지 확인
     const [children] = await db.execute(
@@ -58,8 +59,8 @@ router.put('/:id', authMiddleware, roleMiddleware('parent'), async (req, res) =>
     }
 
     await db.execute(
-      'UPDATE children SET name = ?, age = ?, bus_id = ?, stop_name = ? WHERE id = ?',
-      [name, age, busId, stopName, req.params.id]
+      'UPDATE children SET name = ?, age = ?, bus_id = ?, stop_id = ? WHERE id = ?',
+      [name, age, busId || null, stopId || null, req.params.id]
     );
 
     res.json({ message: '수정 완료' });

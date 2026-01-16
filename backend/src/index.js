@@ -7,6 +7,8 @@ const authRoutes = require('./routes/auth');
 const busRoutes = require('./routes/bus');
 const childRoutes = require('./routes/child');
 const adminRoutes = require('./routes/admin');
+const stopRoutes = require('./routes/stop');
+const etaRoutes = require('./routes/eta');
 const { initSocket } = require('./socket');
 const db = require('./config/database');
 
@@ -34,6 +36,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bus', busRoutes);
 app.use('/api/child', childRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/stop', stopRoutes);
+app.use('/api/eta', etaRoutes);
 
 // 헬스 체크
 app.get('/health', (req, res) => {
