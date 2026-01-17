@@ -341,10 +341,9 @@ function ParentDashboard() {
                   <p className="text-slate-500 font-medium text-sm truncate">
                     {child.bus_number ? `${child.bus_number}호 버스` : '버스 미배정'}
                     {child.stop_name && ` · ${child.stop_name}`}
-                    {child.bus_status && ` · ${child.bus_status}`}
                   </p>
-                  {/* ETA 표시 */}
-                  {etaData[child.id]?.eta && (
+                  {/* ETA 표시 - 승차 중일 때만 */}
+                  {child.boarding_status === '승차' && etaData[child.id]?.eta && (
                     <div className="mt-2 flex items-center gap-2">
                       <span className="material-symbols-outlined text-base text-amber-500">schedule</span>
                       <span className="text-amber-600 font-bold text-sm">
