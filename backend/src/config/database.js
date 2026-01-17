@@ -27,24 +27,28 @@ if (process.env.DB_SSL === 'true' || process.env.DB_SSL === 'REQUIRED') {
 
 const pool = mysql.createPool(dbConfig);
 
-// 연결 테스트 및 에러 핸들링
-pool.on('connection', (connection) => {
-  console.log('새 DB 연결 생성됨');
-});
+// 연결 테스트 및 에러 핸들링 (개발 환경에서만 로그 출력)
+if (process.env.NODE_ENV === 'development' && process.env.DB_DEBUG === 'true') {
+  pool.on('connection', (connection) => {
+    console.log('새 DB 연결 생성됨');
+  });
 
-pool.on('acquire', (connection) => {
-  console.log('DB 연결 획득: ID %d', connection.threadId);
-});
+  pool.on('acquire', (connection) => {
+    console.log('DB 연결 획득: ID %d', connection.threadId);
+  });
 
-pool.on('release', (connection) => {
-  console.log('DB 연결 반환: ID %d', connection.threadId);
-});
+  pool.on('release', (connection) => {
+    console.log('DB 연결 반환: ID %d', connection.threadId);
+  });
+}
 
 // 주기적으로 연결 상태 확인 (5분마다)
 setInterval(async () => {
   try {
     await pool.query('SELECT 1');
-    console.log('DB 연결 상태 확인 완료');
+    if (process.env.DB_DEBUG === 'true') {
+      console.log('DB 연결 상태 확인 완료');
+    }
   } catch (err) {
     console.error('DB 연결 상태 확인 실패:', err.message);
   }
