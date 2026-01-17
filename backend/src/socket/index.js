@@ -106,46 +106,62 @@ function initSocket(io) {
       console.log(`아이 ID: ${childId}, 버스 ID: ${busId}`);
       
       try {
-        await db.execute(
-          'INSERT INTO boarding_log (child_id, bus_id, type) VALUES (?, ?, ?)',
-          [childId, busId, '승차']
-        );
-        console.log('✅ boarding_log 저장 완료');
+        // 트랜잭션으로 묶어서 처리 (성능 개선)
+        const connection = await db.getConnection();
+        await connection.beginTransaction();
         
-        // 해당 아이의 부모 ID 조회
-        const [children] = await db.execute(
-          'SELECT parent_id, name FROM children WHERE id = ?',
-          [childId]
-        );
-        
-        if (children.length === 0) {
-          console.error('❌ 아이 정보를 찾을 수 없음');
-          return;
+        try {
+          // 승차 로그 저장
+          await connection.execute(
+            'INSERT INTO boarding_log (child_id, bus_id, type) VALUES (?, ?, ?)',
+            [childId, busId, '승차']
+          );
+          console.log('✅ boarding_log 저장 완료');
+          
+          // 해당 아이의 부모 ID 조회
+          const [children] = await connection.execute(
+            'SELECT parent_id, name FROM children WHERE id = ?',
+            [childId]
+          );
+          
+          if (children.length === 0) {
+            console.error('❌ 아이 정보를 찾을 수 없음');
+            await connection.rollback();
+            connection.release();
+            return;
+          }
+          
+          const parentId = children[0]?.parent_id;
+          const childName = children[0]?.name;
+          
+          console.log(`부모 ID: ${parentId}, 아이 이름: ${childName}`);
+          
+          // 알림 DB에 저장
+          await connection.execute(
+            'INSERT INTO notifications (user_id, type, title, message, child_id, bus_id) VALUES (?, ?, ?, ?, ?, ?)',
+            [parentId, '승차', '승차 알림', `${childName}이(가) 버스에 탑승했습니다.`, childId, busId]
+          );
+          console.log('✅ 알림 DB 저장 완료');
+          
+          await connection.commit();
+          connection.release();
+          
+          // 부모에게 직접 전송 (개인 룸으로)
+          const eventData = { 
+            childId, 
+            busId, 
+            parentId,
+            childName,
+            time: new Date() 
+          };
+          console.log(`소켓 이벤트 전송: user:${parentId}`, eventData);
+          io.to(`user:${parentId}`).emit('child:boarded', eventData);
+          console.log('✅ 승차 처리 완료\n');
+        } catch (err) {
+          await connection.rollback();
+          connection.release();
+          throw err;
         }
-        
-        const parentId = children[0]?.parent_id;
-        const childName = children[0]?.name;
-        
-        console.log(`부모 ID: ${parentId}, 아이 이름: ${childName}`);
-        
-        // 알림 DB에 저장
-        await db.execute(
-          'INSERT INTO notifications (user_id, type, title, message, child_id, bus_id) VALUES (?, ?, ?, ?, ?, ?)',
-          [parentId, '승차', '승차 알림', `${childName}이(가) 버스에 탑승했습니다.`, childId, busId]
-        );
-        console.log('✅ 알림 DB 저장 완료');
-        
-        // 부모에게 직접 전송 (개인 룸으로)
-        const eventData = { 
-          childId, 
-          busId, 
-          parentId,
-          childName,
-          time: new Date() 
-        };
-        console.log(`소켓 이벤트 전송: user:${parentId}`, eventData);
-        io.to(`user:${parentId}`).emit('child:boarded', eventData);
-        console.log('✅ 승차 처리 완료\n');
       } catch (err) {
         console.error('❌ 승차 처리 오류:', err);
       }
@@ -156,39 +172,63 @@ function initSocket(io) {
       if (socket.user.role !== 'driver') return;
 
       const { childId, busId } = data;
+      console.log(`\n=== 하차 처리 시작 ===`);
+      console.log(`아이 ID: ${childId}, 버스 ID: ${busId}`);
+      
       try {
-        await db.execute(
-          'INSERT INTO boarding_log (child_id, bus_id, type) VALUES (?, ?, ?)',
-          [childId, busId, '하차']
-        );
+        // 트랜잭션으로 묶어서 처리
+        const connection = await db.getConnection();
+        await connection.beginTransaction();
         
-        // 해당 아이의 부모 ID 조회
-        const [children] = await db.execute(
-          'SELECT parent_id, name FROM children WHERE id = ?',
-          [childId]
-        );
-        
-        const parentId = children[0]?.parent_id;
-        const childName = children[0]?.name;
-        
-        console.log(`하차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
-        
-        // 알림 DB에 저장
-        await db.execute(
-          'INSERT INTO notifications (user_id, type, title, message, child_id, bus_id) VALUES (?, ?, ?, ?, ?, ?)',
-          [parentId, '하차', '하차 알림', `${childName}이(가) 버스에서 하차했습니다.`, childId, busId]
-        );
-        
-        // 부모에게 직접 전송 (개인 룸으로만)
-        io.to(`user:${parentId}`).emit('child:alighted', { 
-          childId, 
-          busId, 
-          parentId,
-          childName,
-          time: new Date() 
-        });
+        try {
+          await connection.execute(
+            'INSERT INTO boarding_log (child_id, bus_id, type) VALUES (?, ?, ?)',
+            [childId, busId, '하차']
+          );
+          
+          // 해당 아이의 부모 ID 조회
+          const [children] = await connection.execute(
+            'SELECT parent_id, name FROM children WHERE id = ?',
+            [childId]
+          );
+          
+          if (children.length === 0) {
+            console.error('❌ 아이 정보를 찾을 수 없음');
+            await connection.rollback();
+            connection.release();
+            return;
+          }
+          
+          const parentId = children[0]?.parent_id;
+          const childName = children[0]?.name;
+          
+          console.log(`부모 ID: ${parentId}, 아이 이름: ${childName}`);
+          
+          // 알림 DB에 저장
+          await connection.execute(
+            'INSERT INTO notifications (user_id, type, title, message, child_id, bus_id) VALUES (?, ?, ?, ?, ?, ?)',
+            [parentId, '하차', '하차 알림', `${childName}이(가) 버스에서 하차했습니다.`, childId, busId]
+          );
+          
+          await connection.commit();
+          connection.release();
+          
+          // 부모에게 직접 전송 (개인 룸으로)
+          io.to(`user:${parentId}`).emit('child:alighted', { 
+            childId, 
+            busId, 
+            parentId,
+            childName,
+            time: new Date() 
+          });
+          console.log('✅ 하차 처리 완료\n');
+        } catch (err) {
+          await connection.rollback();
+          connection.release();
+          throw err;
+        }
       } catch (err) {
-        console.error('하차 처리 오류:', err);
+        console.error('❌ 하차 처리 오류:', err);
       }
     });
 
