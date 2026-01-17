@@ -99,10 +99,26 @@ function ParentDashboard() {
     });
 
     socket.on('child:alighted', (data) => {
+      console.log('하차 이벤트 수신:', data);
       const child = children.find(c => c.id === data.childId);
       if (child) {
         alert(`${child.name}이(가) 버스에서 하차했습니다.`);
         loadChildren();
+        
+        // 내 아이가 하차한 경우, 해당 버스에 다른 내 아이가 없으면 위치 공유 중단
+        if (data.parentId === user?.id) {
+          // 현재 children 상태에서 같은 버스의 다른 아이 확인
+          const otherChildrenOnSameBus = children.filter(c => 
+            c.bus_id === data.busId && c.id !== data.childId
+          );
+          
+          console.log('같은 버스의 다른 아이:', otherChildrenOnSameBus);
+          
+          if (otherChildrenOnSameBus.length === 0) {
+            console.log('더 이상 탑승 중인 아이가 없음 - 위치 공유 중단');
+            setBusLocation(null);
+          }
+        }
       }
     });
 
