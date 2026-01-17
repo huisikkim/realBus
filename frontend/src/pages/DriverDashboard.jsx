@@ -8,6 +8,7 @@ function DriverDashboard() {
   const [children, setChildren] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [hiddenButtons, setHiddenButtons] = useState({}); // 버튼 숨김 상태 관리
   const { socket, connected } = useSocket();
   const watchIdRef = useRef(null);
 
@@ -127,9 +128,13 @@ function DriverDashboard() {
     if (type === 'board') {
       socket.emit('driver:childBoarded', { childId, busId: bus.id });
       alert('승차 처리되었습니다.');
+      // 승차 버튼 숨기기
+      setHiddenButtons(prev => ({ ...prev, [`${childId}-board`]: true }));
     } else {
       socket.emit('driver:childAlighted', { childId, busId: bus.id });
       alert('하차 처리되었습니다.');
+      // 하차 버튼 숨기기
+      setHiddenButtons(prev => ({ ...prev, [`${childId}-alight`]: true }));
     }
   };
 
@@ -262,20 +267,24 @@ function DriverDashboard() {
                 
                 {isRunning && (
                   <div className="flex gap-3 w-full md:w-auto">
-                    <button 
-                      onClick={() => handleBoarding(child.id, 'board')}
-                      className="flex-1 md:flex-none bg-white hover:bg-emerald-50 text-safe-green border-2 border-emerald-500 px-4 md:px-8 py-3 md:py-4 rounded-xl font-bold md:font-black text-base md:text-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
-                    >
-                      <span className="material-symbols-outlined text-xl md:text-2xl font-bold">login</span>
-                      승차
-                    </button>
-                    <button 
-                      onClick={() => handleBoarding(child.id, 'alight')}
-                      className="flex-1 md:flex-none bg-navy hover:bg-navy-dark text-white border-2 border-navy px-4 md:px-8 py-3 md:py-4 rounded-xl font-bold md:font-black text-base md:text-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md shadow-navy/10"
-                    >
-                      <span className="material-symbols-outlined text-xl md:text-2xl font-bold">logout</span>
-                      하차
-                    </button>
+                    {!hiddenButtons[`${child.id}-board`] && (
+                      <button 
+                        onClick={() => handleBoarding(child.id, 'board')}
+                        className="flex-1 md:flex-none bg-white hover:bg-emerald-50 text-safe-green border-2 border-emerald-500 px-4 md:px-8 py-3 md:py-4 rounded-xl font-bold md:font-black text-base md:text-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <span className="material-symbols-outlined text-xl md:text-2xl font-bold">login</span>
+                        승차
+                      </button>
+                    )}
+                    {!hiddenButtons[`${child.id}-alight`] && (
+                      <button 
+                        onClick={() => handleBoarding(child.id, 'alight')}
+                        className="flex-1 md:flex-none bg-navy hover:bg-navy-dark text-white border-2 border-navy px-4 md:px-8 py-3 md:py-4 rounded-xl font-bold md:font-black text-base md:text-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md shadow-navy/10"
+                      >
+                        <span className="material-symbols-outlined text-xl md:text-2xl font-bold">logout</span>
+                        하차
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
