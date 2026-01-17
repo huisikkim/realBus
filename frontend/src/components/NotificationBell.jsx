@@ -57,7 +57,12 @@ function NotificationBell() {
   };
 
   const formatTime = (timestamp) => {
+    if (!timestamp) return '';
+    
+    // MySQL에서 받은 UTC 시간에 9시간(한국 시간) 더하기
     const date = new Date(timestamp);
+    date.setHours(date.getHours() + 9);
+    
     const now = new Date();
     const diff = Math.floor((now - date) / 1000); // 초 단위
 
