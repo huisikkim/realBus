@@ -1,0 +1,10 @@
+{
+  "name": "셔틀버스 안전 서비스",
+  "short_name": "셔틀버스",
+  "description": "실시간 어린이 셔틀버스 위치 추적 서비스",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "icons": []
+}

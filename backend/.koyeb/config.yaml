@@ -1,0 +1,21 @@
+name: shuttle-bus-backend
+type: web
+instance_type: nano
+regions:
+  - fra
+ports:
+  - port: 3000
+    protocol: http
+env:
+  - key: NODE_ENV
+    value: production
+routes:
+  - path: /
+    port: 3000
+health_checks:
+  - path: /health
+    port: 3000
+    protocol: http
+    interval: 60s
+    timeout: 10s
+    grace_period: 5s
