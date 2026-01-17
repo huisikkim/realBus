@@ -111,27 +111,14 @@ function initSocket(io) {
         
         console.log(`승차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
         
-        // 버스 룸에 브로드캐스트 (모든 구독자에게)
-        io.to(`bus:${busId}`).emit('child:boarded', { 
+        // 부모에게 직접 전송 (개인 룸으로만)
+        io.to(`user:${parentId}`).emit('child:boarded', { 
           childId, 
           busId, 
           parentId,
           childName,
           time: new Date() 
         });
-        
-        // 부모에게 직접 전송 (연결되어 있다면)
-        const parentSockets = await io.in(`user:${parentId}`).fetchSockets();
-        if (parentSockets.length > 0) {
-          console.log(`부모 ${parentId}에게 직접 승차 알림 전송`);
-          io.to(`user:${parentId}`).emit('child:boarded', { 
-            childId, 
-            busId, 
-            parentId,
-            childName,
-            time: new Date() 
-          });
-        }
       } catch (err) {
         console.error('승차 처리 오류:', err);
       }
@@ -159,27 +146,14 @@ function initSocket(io) {
         
         console.log(`하차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
         
-        // 버스 룸에 브로드캐스트
-        io.to(`bus:${busId}`).emit('child:alighted', { 
+        // 부모에게 직접 전송 (개인 룸으로만)
+        io.to(`user:${parentId}`).emit('child:alighted', { 
           childId, 
           busId, 
           parentId,
           childName,
           time: new Date() 
         });
-        
-        // 부모에게 직접 전송
-        const parentSockets = await io.in(`user:${parentId}`).fetchSockets();
-        if (parentSockets.length > 0) {
-          console.log(`부모 ${parentId}에게 직접 하차 알림 전송`);
-          io.to(`user:${parentId}`).emit('child:alighted', { 
-            childId, 
-            busId, 
-            parentId,
-            childName,
-            time: new Date() 
-          });
-        }
       } catch (err) {
         console.error('하차 처리 오류:', err);
       }
