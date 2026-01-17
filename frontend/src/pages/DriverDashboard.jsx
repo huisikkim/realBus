@@ -12,6 +12,8 @@ function DriverDashboard() {
   const { socket, connected } = useSocket();
   const watchIdRef = useRef(null);
   const lastUpdateTimeRef = useRef(0); // 마지막 업데이트 시간 추적
+  const lastValidLocationRef = useRef(null); // 마지막 유효한 위치 저장
+  const gpsErrorCountRef = useRef(0); // GPS 에러 카운트
 
   useEffect(() => {
     loadMyBus();
@@ -94,7 +96,15 @@ function DriverDashboard() {
             return;
           }
           
+          // GPS 정확도 체크 (accuracy가 너무 낮으면 무시)
+          const accuracy = position.coords.accuracy;
+          if (accuracy > 100) {
+            console.warn(`GPS 정확도 낮음 (${accuracy}m) - 업데이트 건너뜀`);
+            return;
+          }
+          
           lastUpdateTimeRef.current = now;
+          gpsErrorCountRef.current = 0; // 성공 시 에러 카운트 리셋
           
           const locationData = {
             busId: bus.id,
@@ -102,26 +112,54 @@ function DriverDashboard() {
             longitude: position.coords.longitude,
             speed: position.coords.speed ? Math.round(position.coords.speed * 3.6) : 0
           };
-          console.log('위치 업데이트:', locationData);
+          
+          console.log('위치 업데이트:', locationData, `정확도: ${accuracy}m`);
+          
+          // 마지막 유효한 위치 저장
+          lastValidLocationRef.current = locationData;
+          
           setCurrentLocation(locationData);
           socket.emit('driver:updateLocation', locationData);
         },
         (error) => {
-          console.error('GPS 오류:', error);
-          const defaultLocation = {
-            busId: bus.id,
-            latitude: 37.5665,
-            longitude: 126.9780,
-            speed: 0
-          };
-          console.log('기본 위치 사용:', defaultLocation);
-          setCurrentLocation(defaultLocation);
-          socket.emit('driver:updateLocation', defaultLocation);
+          gpsErrorCountRef.current++;
+          console.error(`GPS 오류 (${gpsErrorCountRef.current}회):`, error.code, error.message);
+          
+          // 에러 타입별 처리
+          let errorMessage = '';
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = '위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'GPS 신호를 찾을 수 없습니다. 잠시 후 다시 시도됩니다.';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'GPS 응답 시간 초과. 계속 시도 중입니다.';
+              break;
+          }
+          
+          // 첫 번째 에러에만 알림 표시
+          if (gpsErrorCountRef.current === 1) {
+            console.warn(errorMessage);
+          }
+          
+          // 마지막 유효한 위치가 있으면 그것을 사용 (서울 좌표 대신)
+          if (lastValidLocationRef.current) {
+            console.log('마지막 유효한 위치 사용:', lastValidLocationRef.current);
+            // 화면에는 표시하지만 서버에는 보내지 않음 (부정확한 위치 전송 방지)
+            setCurrentLocation(lastValidLocationRef.current);
+          } else {
+            // 정말 처음부터 위치를 못 잡은 경우에만 기본 위치 사용
+            console.warn('유효한 위치 없음 - 위치 업데이트 대기 중');
+            // 서버에 아무것도 보내지 않음
+          }
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 5000,  // 5초로 줄임
-          timeout: 10000
+          maximumAge: 5000,
+          timeout: 15000, // 타임아웃을 15초로 늘림 (사파리 대응)
+          distanceFilter: 10 // 10미터 이상 이동 시에만 업데이트 (iOS Safari)
         }
       );
 
@@ -150,6 +188,10 @@ function DriverDashboard() {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
+
+    // 상태 초기화
+    lastValidLocationRef.current = null;
+    gpsErrorCountRef.current = 0;
 
     socket.emit('driver:endTrip', { busId: bus.id });
     setIsRunning(false);
