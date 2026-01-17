@@ -2,19 +2,22 @@ const express = require('express');
 const db = require('../config/database');
 const { authMiddleware } = require('../middleware/auth');
 const { busLocations } = require('../socket');
+const { executeWithRetry } = require('../utils/dbRetry');
 
 const router = express.Router();
 
 // 아이별 ETA 조회
 router.get('/child/:childId', authMiddleware, async (req, res) => {
   try {
-    // 아이 정보 + 정류장 좌표 조회
-    const [children] = await db.execute(`
-      SELECT c.*, s.latitude as stop_lat, s.longitude as stop_lng, s.name as stop_name
-      FROM children c
-      LEFT JOIN stops s ON c.stop_id = s.id
-      WHERE c.id = ?
-    `, [req.params.childId]);
+    // 아이 정보 + 정류장 좌표 조회 (재시도 로직 포함)
+    const [children] = await executeWithRetry(() => 
+      db.execute(`
+        SELECT c.*, s.latitude as stop_lat, s.longitude as stop_lng, s.name as stop_name
+        FROM children c
+        LEFT JOIN stops s ON c.stop_id = s.id
+        WHERE c.id = ?
+      `, [req.params.childId])
+    );
 
     if (children.length === 0) {
       return res.status(404).json({ error: '아이를 찾을 수 없습니다' });
@@ -64,7 +67,7 @@ router.get('/child/:childId', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     console.error('ETA 조회 오류:', err);
-    res.status(500).json({ error: '서버 오류' });
+    res.status(500).json({ error: '데이터베이스 연결 오류' });
   }
 });
 
@@ -77,9 +80,11 @@ router.get('/bus/:busId/stops', authMiddleware, async (req, res) => {
       return res.json({ stops: [], message: '버스가 운행 중이 아닙니다' });
     }
 
-    const [stops] = await db.execute(
-      'SELECT * FROM stops WHERE bus_id = ? ORDER BY stop_order ASC',
-      [req.params.busId]
+    const [stops] = await executeWithRetry(() =>
+      db.execute(
+        'SELECT * FROM stops WHERE bus_id = ? ORDER BY stop_order ASC',
+        [req.params.busId]
+      )
     );
 
     const stopsWithEta = stops.map(stop => {
@@ -103,7 +108,7 @@ router.get('/bus/:busId/stops', authMiddleware, async (req, res) => {
     res.json({ stops: stopsWithEta, busLocation });
   } catch (err) {
     console.error('버스 정류장 ETA 조회 오류:', err);
-    res.status(500).json({ error: '서버 오류' });
+    res.status(500).json({ error: '데이터베이스 연결 오류' });
   }
 });
 

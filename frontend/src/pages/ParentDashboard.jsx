@@ -22,17 +22,25 @@ function ParentDashboard() {
 
   // ETA 주기적 업데이트
   useEffect(() => {
-    if (children.length === 0 || !busLocation) return;
+    // 승차 중인 아이가 없거나 버스 위치가 없으면 ETA 조회 안함
+    const boardedChildren = children.filter(c => c.boarding_status === '승차');
+    if (boardedChildren.length === 0 || !busLocation) {
+      setEtaData({});
+      return;
+    }
 
     const fetchEta = async () => {
       const etaResults = {};
-      for (const child of children) {
+      for (const child of boardedChildren) {
         if (child.bus_id && child.stop_id) {
           try {
             const res = await api.get(`/eta/child/${child.id}`);
             etaResults[child.id] = res.data;
           } catch (err) {
-            console.error('ETA 조회 실패:', err);
+            // 버스가 운행 중이 아니면 에러 무시
+            if (err.response?.status !== 500) {
+              console.error('ETA 조회 실패:', err);
+            }
           }
         }
       }
