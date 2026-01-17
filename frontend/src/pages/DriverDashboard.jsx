@@ -11,6 +11,7 @@ function DriverDashboard() {
   const [hiddenButtons, setHiddenButtons] = useState({}); // 버튼 숨김 상태 관리
   const { socket, connected } = useSocket();
   const watchIdRef = useRef(null);
+  const lastUpdateTimeRef = useRef(0); // 마지막 업데이트 시간 추적
 
   useEffect(() => {
     loadMyBus();
@@ -85,6 +86,16 @@ function DriverDashboard() {
       
       watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
+          const now = Date.now();
+          const timeSinceLastUpdate = now - lastUpdateTimeRef.current;
+          
+          // 최소 5초 간격으로만 업데이트 (5000ms)
+          if (timeSinceLastUpdate < 5000) {
+            return;
+          }
+          
+          lastUpdateTimeRef.current = now;
+          
           const locationData = {
             busId: bus.id,
             latitude: position.coords.latitude,
@@ -109,7 +120,7 @@ function DriverDashboard() {
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 10000,
+          maximumAge: 5000,  // 5초로 줄임
           timeout: 10000
         }
       );
