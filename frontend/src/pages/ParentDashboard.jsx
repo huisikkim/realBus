@@ -328,10 +328,20 @@ function ParentDashboard() {
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <h4 className="text-lg md:text-xl font-extrabold text-navy">{child.name}</h4>
                     <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{child.age}세</span>
+                    {child.boarding_status && (
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                        child.boarding_status === '승차' 
+                          ? 'bg-emerald-50 text-safe-green border border-emerald-100' 
+                          : 'bg-slate-100 text-slate-500 border border-slate-200'
+                      }`}>
+                        {child.boarding_status}
+                      </span>
+                    )}
                   </div>
                   <p className="text-slate-500 font-medium text-sm truncate">
                     {child.bus_number ? `${child.bus_number}호 버스` : '버스 미배정'}
                     {child.stop_name && ` · ${child.stop_name}`}
+                    {child.bus_status && ` · ${child.bus_status}`}
                   </p>
                   {/* ETA 표시 */}
                   {etaData[child.id]?.eta && (
@@ -346,15 +356,6 @@ function ParentDashboard() {
                     </div>
                   )}
                 </div>
-                {child.bus_status && (
-                  <span className={`px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0 ${
-                    child.bus_status === '운행중' 
-                      ? 'bg-emerald-50 text-safe-green border border-emerald-100' 
-                      : 'bg-slate-100 text-slate-500 border border-slate-200'
-                  }`}>
-                    {child.bus_status}
-                  </span>
-                )}
               </div>
             ))}
           </div>
