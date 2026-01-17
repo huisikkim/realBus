@@ -345,19 +345,19 @@ function AdminDashboard() {
           <div className="space-y-3">
             {users.map(user => (
               <div key={user.id} className="bg-slate-50 rounded-2xl p-5 border border-slate-100 flex items-center justify-between hover:border-slate-200 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-navy text-white rounded-xl flex items-center justify-center text-lg font-black shadow-md">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <div className="w-12 h-12 bg-navy text-white rounded-xl flex items-center justify-center text-lg font-black shadow-md flex-shrink-0">
                     {user.name.charAt(0)}
                   </div>
-                  <div>
-                    <h4 className="text-lg font-extrabold text-navy">{user.name}</h4>
-                    <p className="text-slate-500 text-sm font-medium">{user.email}</p>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-lg font-extrabold text-navy truncate">{user.name}</h4>
+                    <p className="text-slate-500 text-sm font-medium truncate">{user.email}</p>
                   </div>
                 </div>
                 <select
                   value={user.role}
                   onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                  className={`px-4 py-2 rounded-lg font-bold text-sm border-2 outline-none transition-all ${
+                  className={`px-4 py-2 rounded-lg font-bold text-sm border-2 outline-none transition-all flex-shrink-0 w-28 ${
                     user.role === 'admin' 
                       ? 'border-action-red bg-red-50 text-action-red'
                       : user.role === 'driver'
