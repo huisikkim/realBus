@@ -96,7 +96,21 @@ function initSocket(io) {
           'INSERT INTO boarding_log (child_id, bus_id, type) VALUES (?, ?, ?)',
           [childId, busId, '승차']
         );
-        io.to(`bus:${busId}`).emit('child:boarded', { childId, busId, time: new Date() });
+        
+        // 해당 아이의 부모 ID 조회
+        const [children] = await db.execute(
+          'SELECT parent_id FROM children WHERE id = ?',
+          [childId]
+        );
+        
+        const parentId = children[0]?.parent_id;
+        
+        io.to(`bus:${busId}`).emit('child:boarded', { 
+          childId, 
+          busId, 
+          parentId,
+          time: new Date() 
+        });
       } catch (err) {
         console.error('승차 처리 오류:', err);
       }
