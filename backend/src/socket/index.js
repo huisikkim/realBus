@@ -22,6 +22,9 @@ function initSocket(io) {
 
   io.on('connection', (socket) => {
     console.log(`사용자 연결: ${socket.user.id} (${socket.user.role})`);
+    
+    // 사용자별 룸에 자동 참여 (개인 알림용)
+    socket.join(`user:${socket.user.id}`);
 
     // 기사: 위치 업데이트
     socket.on('driver:updateLocation', async (data) => {
@@ -99,18 +102,36 @@ function initSocket(io) {
         
         // 해당 아이의 부모 ID 조회
         const [children] = await db.execute(
-          'SELECT parent_id FROM children WHERE id = ?',
+          'SELECT parent_id, name FROM children WHERE id = ?',
           [childId]
         );
         
         const parentId = children[0]?.parent_id;
+        const childName = children[0]?.name;
         
+        console.log(`승차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
+        
+        // 버스 룸에 브로드캐스트 (모든 구독자에게)
         io.to(`bus:${busId}`).emit('child:boarded', { 
           childId, 
           busId, 
           parentId,
+          childName,
           time: new Date() 
         });
+        
+        // 부모에게 직접 전송 (연결되어 있다면)
+        const parentSockets = await io.in(`user:${parentId}`).fetchSockets();
+        if (parentSockets.length > 0) {
+          console.log(`부모 ${parentId}에게 직접 승차 알림 전송`);
+          io.to(`user:${parentId}`).emit('child:boarded', { 
+            childId, 
+            busId, 
+            parentId,
+            childName,
+            time: new Date() 
+          });
+        }
       } catch (err) {
         console.error('승차 처리 오류:', err);
       }
@@ -129,18 +150,36 @@ function initSocket(io) {
         
         // 해당 아이의 부모 ID 조회
         const [children] = await db.execute(
-          'SELECT parent_id FROM children WHERE id = ?',
+          'SELECT parent_id, name FROM children WHERE id = ?',
           [childId]
         );
         
         const parentId = children[0]?.parent_id;
+        const childName = children[0]?.name;
         
+        console.log(`하차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
+        
+        // 버스 룸에 브로드캐스트
         io.to(`bus:${busId}`).emit('child:alighted', { 
           childId, 
           busId, 
           parentId,
+          childName,
           time: new Date() 
         });
+        
+        // 부모에게 직접 전송
+        const parentSockets = await io.in(`user:${parentId}`).fetchSockets();
+        if (parentSockets.length > 0) {
+          console.log(`부모 ${parentId}에게 직접 하차 알림 전송`);
+          io.to(`user:${parentId}`).emit('child:alighted', { 
+            childId, 
+            busId, 
+            parentId,
+            childName,
+            time: new Date() 
+          });
+        }
       } catch (err) {
         console.error('하차 처리 오류:', err);
       }

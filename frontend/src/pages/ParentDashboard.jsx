@@ -58,66 +58,97 @@ function ParentDashboard() {
     if (!socket || !connected) return;
 
     // 소켓 이벤트 리스너 등록
-    socket.on('bus:locationUpdate', (data) => {
+    const handleLocationUpdate = (data) => {
       console.log('위치 업데이트 수신:', data);
-      // 승차 중인 아이가 있는 버스의 위치만 표시
-      const boardedChildren = children.filter(c => c.bus_id && c.boarding_status === '승차');
-      const isBoardedBus = boardedChildren.some(c => c.bus_id === data.busId);
-      if (isBoardedBus) {
-        setBusLocation(data);
-      }
-    });
+      // 위치 업데이트는 항상 받아서 저장 (버스 구독이 되어있다면)
+      setBusLocation(data);
+    };
 
-    socket.on('bus:tripStarted', (data) => {
+    const handleTripStarted = (data) => {
       console.log('운행 시작:', data);
       loadChildren();
-    });
+    };
 
-    socket.on('bus:tripEnded', (data) => {
+    const handleTripEnded = (data) => {
       console.log('운행 종료:', data);
       setBusLocation(null);
       loadChildren();
-    });
+    };
 
-    socket.on('child:boarded', (data) => {
+    const handleChildBoarded = async (data) => {
       console.log('승차 이벤트 수신:', data);
-      const child = children.find(c => c.id === data.childId);
-      if (child) {
-        alert(`${child.name}이(가) 버스에 탑승했습니다.`);
-      }
-      // 승차 상태 업데이트를 위해 children 다시 로드
-      loadChildren();
-    });
-
-    socket.on('child:alighted', (data) => {
-      console.log('하차 이벤트 수신:', data);
-      const child = children.find(c => c.id === data.childId);
-      if (child) {
-        alert(`${child.name}이(가) 버스에서 하차했습니다.`);
-        
-        // 내 아이가 하차한 경우 즉시 위치 공유 중단
-        if (data.parentId === user?.id) {
-          console.log('내 아이 하차 - 위치 공유 중단');
-          setBusLocation(null);
+      
+      // 내 아이인지 확인
+      if (data.parentId === user?.id) {
+        // 아이 정보를 다시 로드하여 최신 상태 가져오기
+        try {
+          const res = await api.get('/child/my');
+          const updatedChildren = res.data;
+          setChildren(updatedChildren);
+          
+          // 승차한 아이 찾기
+          const child = updatedChildren.find(c => c.id === data.childId);
+          if (child) {
+            alert(`${child.name}이(가) 버스에 탑승했습니다.`);
+            
+            // 즉시 버스 구독
+            if (child.bus_id) {
+              console.log('승차 후 버스 구독:', child.bus_id);
+              socket.emit('parent:subscribeBus', { busId: child.bus_id });
+            }
+          }
+        } catch (err) {
+          console.error('아이 정보 로드 실패:', err);
+          loadChildren();
         }
       }
-      // 하차 상태 업데이트를 위해 children 다시 로드
-      loadChildren();
-    });
+    };
 
-    socket.on('emergency:alert', (data) => {
+    const handleChildAlighted = async (data) => {
+      console.log('하차 이벤트 수신:', data);
+      
+      // 내 아이가 하차한 경우
+      if (data.parentId === user?.id) {
+        console.log('내 아이 하차 - 위치 공유 중단');
+        setBusLocation(null);
+        
+        // 아이 정보를 다시 로드
+        try {
+          const res = await api.get('/child/my');
+          const updatedChildren = res.data;
+          setChildren(updatedChildren);
+          
+          const child = updatedChildren.find(c => c.id === data.childId);
+          if (child) {
+            alert(`${child.name}이(가) 버스에서 하차했습니다.`);
+          }
+        } catch (err) {
+          console.error('아이 정보 로드 실패:', err);
+          loadChildren();
+        }
+      }
+    };
+
+    const handleEmergencyAlert = (data) => {
       alert(`⚠️ 비상 알림: ${data.message}`);
-    });
+    };
+
+    socket.on('bus:locationUpdate', handleLocationUpdate);
+    socket.on('bus:tripStarted', handleTripStarted);
+    socket.on('bus:tripEnded', handleTripEnded);
+    socket.on('child:boarded', handleChildBoarded);
+    socket.on('child:alighted', handleChildAlighted);
+    socket.on('emergency:alert', handleEmergencyAlert);
 
     return () => {
-      socket.off('bus:locationUpdate');
-      socket.off('bus:tripStarted');
-      socket.off('bus:tripEnded');
-      socket.off('child:boarded');
-      socket.off('child:alighted');
-      socket.off('emergency:alert');
+      socket.off('bus:locationUpdate', handleLocationUpdate);
+      socket.off('bus:tripStarted', handleTripStarted);
+      socket.off('bus:tripEnded', handleTripEnded);
+      socket.off('child:boarded', handleChildBoarded);
+      socket.off('child:alighted', handleChildAlighted);
+      socket.off('emergency:alert', handleEmergencyAlert);
     };
-  }, [socket, connected, children, user]);
+  }, [socket, connected, user]);
 
   // 버스 구독 관리 (children 상태가 변경될 때마다 실행)
   useEffect(() => {

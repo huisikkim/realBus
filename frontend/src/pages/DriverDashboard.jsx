@@ -70,9 +70,19 @@ function DriverDashboard() {
   };
 
   const startTrip = () => {
-    if (!bus || !socket) return;
+    if (!bus) {
+      alert('버스 정보를 불러오는 중입니다.');
+      return;
+    }
+    
+    if (!socket || !connected) {
+      alert('서버와 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
 
     if ('geolocation' in navigator) {
+      console.log('운행 시작 - 버스 ID:', bus.id);
+      
       watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
           const locationData = {
@@ -81,6 +91,7 @@ function DriverDashboard() {
             longitude: position.coords.longitude,
             speed: position.coords.speed ? Math.round(position.coords.speed * 3.6) : 0
           };
+          console.log('위치 업데이트:', locationData);
           setCurrentLocation(locationData);
           socket.emit('driver:updateLocation', locationData);
         },
@@ -92,6 +103,7 @@ function DriverDashboard() {
             longitude: 126.9780,
             speed: 0
           };
+          console.log('기본 위치 사용:', defaultLocation);
           setCurrentLocation(defaultLocation);
           socket.emit('driver:updateLocation', defaultLocation);
         },
@@ -102,6 +114,7 @@ function DriverDashboard() {
         }
       );
 
+      console.log('운행 시작 이벤트 전송');
       socket.emit('driver:startTrip', { busId: bus.id });
       setIsRunning(true);
     } else {
@@ -110,7 +123,17 @@ function DriverDashboard() {
   };
 
   const endTrip = () => {
-    if (!bus || !socket) return;
+    if (!bus) {
+      alert('버스 정보를 불러오는 중입니다.');
+      return;
+    }
+    
+    if (!socket || !connected) {
+      alert('서버와 연결되지 않았습니다.');
+      return;
+    }
+
+    console.log('운행 종료 - 버스 ID:', bus.id);
 
     if (watchIdRef.current) {
       navigator.geolocation.clearWatch(watchIdRef.current);
@@ -123,14 +146,24 @@ function DriverDashboard() {
   };
 
   const handleBoarding = (childId, type) => {
-    if (!bus || !socket) return;
+    if (!bus) {
+      alert('버스 정보를 불러오는 중입니다.');
+      return;
+    }
+    
+    if (!socket || !connected) {
+      alert('서버와 연결되지 않았습니다.');
+      return;
+    }
 
     if (type === 'board') {
+      console.log('승차 처리:', childId, bus.id);
       socket.emit('driver:childBoarded', { childId, busId: bus.id });
       alert('승차 처리되었습니다.');
       // 승차 버튼 숨기기
       setHiddenButtons(prev => ({ ...prev, [`${childId}-board`]: true }));
     } else {
+      console.log('하차 처리:', childId, bus.id);
       socket.emit('driver:childAlighted', { childId, busId: bus.id });
       alert('하차 처리되었습니다.');
       // 하차 버튼 숨기기
@@ -158,8 +191,8 @@ function DriverDashboard() {
       <section className="bg-white rounded-large shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-1 flex-wrap">
                 <h2 className="text-2xl md:text-3xl font-extrabold text-navy">{bus.bus_number}호 버스</h2>
                 <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide border ${
                   isRunning 
@@ -167,6 +200,14 @@ function DriverDashboard() {
                     : 'bg-slate-100 text-slate-500 border-slate-200'
                 }`}>
                   {isRunning ? '운행중' : '대기'}
+                </span>
+                <span className={`px-3 py-1 rounded-md text-xs font-bold flex items-center gap-1.5 ${
+                  connected 
+                    ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                    : 'bg-rose-50 text-rose-600 border border-rose-100'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-blue-600 animate-pulse' : 'bg-rose-600'}`}></span>
+                  {connected ? '서버 연결됨' : '서버 연결 안됨'}
                 </span>
               </div>
               <p className="text-slate-500 font-semibold text-sm">최대 정원: {bus.capacity}명 | 현재 탑승: {children.length}명</p>
@@ -200,11 +241,22 @@ function DriverDashboard() {
           </div>
 
           {/* 운행 버튼 */}
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-3">
+            {!connected && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">warning</span>
+                서버와 연결되지 않았습니다. 잠시 후 다시 시도해주세요.
+              </div>
+            )}
             {!isRunning ? (
               <button 
                 onClick={startTrip}
-                className="w-full max-w-md bg-safe-green hover:bg-emerald-600 text-white py-4 md:py-5 rounded-xl font-extrabold text-lg md:text-xl transition-all shadow-lg shadow-emerald-100 active:scale-[0.99] flex items-center justify-center gap-3"
+                disabled={!connected}
+                className={`w-full max-w-md py-4 md:py-5 rounded-xl font-extrabold text-lg md:text-xl transition-all shadow-lg flex items-center justify-center gap-3 ${
+                  connected 
+                    ? 'bg-safe-green hover:bg-emerald-600 text-white shadow-emerald-100 active:scale-[0.99] cursor-pointer' 
+                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                }`}
               >
                 <span className="material-symbols-outlined font-bold text-2xl">play_circle</span>
                 운행 시작
@@ -212,7 +264,12 @@ function DriverDashboard() {
             ) : (
               <button 
                 onClick={endTrip}
-                className="w-full max-w-md bg-rose-400 hover:bg-rose-500 text-white py-4 md:py-5 rounded-xl font-extrabold text-lg md:text-xl transition-all shadow-lg shadow-rose-100 active:scale-[0.99] flex items-center justify-center gap-3"
+                disabled={!connected}
+                className={`w-full max-w-md py-4 md:py-5 rounded-xl font-extrabold text-lg md:text-xl transition-all shadow-lg flex items-center justify-center gap-3 ${
+                  connected 
+                    ? 'bg-rose-400 hover:bg-rose-500 text-white shadow-rose-100 active:scale-[0.99] cursor-pointer' 
+                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                }`}
               >
                 <span className="material-symbols-outlined font-bold text-2xl">stop_circle</span>
                 운행 종료
