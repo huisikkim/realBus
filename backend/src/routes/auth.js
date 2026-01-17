@@ -34,34 +34,54 @@ router.post('/register', async (req, res) => {
 
 // 로그인
 router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const maxRetries = 3;
+  let lastError;
 
-    const [users] = await db.execute('SELECT * FROM shuttle_users WHERE email = ?', [email]);
-    if (users.length === 0) {
-      return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다' });
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const { email, password } = req.body;
+
+      const [users] = await db.execute('SELECT * FROM shuttle_users WHERE email = ?', [email]);
+      if (users.length === 0) {
+        return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다' });
+      }
+
+      const user = users[0];
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) {
+        return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다' });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role, name: user.name },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      return res.json({
+        token,
+        user: { id: user.id, email: user.email, name: user.name, role: user.role }
+      });
+    } catch (err) {
+      lastError = err;
+      console.error(`로그인 시도 ${attempt}/${maxRetries} 실패:`, err.message);
+      
+      // ECONNRESET 등 연결 오류인 경우 재시도
+      if (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_CONNECTION_LOST') {
+        if (attempt < maxRetries) {
+          console.log(`${attempt}초 후 재시도...`);
+          await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+          continue;
+        }
+      }
+      
+      // 다른 오류는 즉시 반환
+      break;
     }
-
-    const user = users[0];
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-      return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다' });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, name: user.name },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.json({
-      token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role }
-    });
-  } catch (err) {
-    console.error('로그인 오류:', err);
-    res.status(500).json({ error: '서버 오류' });
   }
+
+  console.error('로그인 최종 실패:', lastError);
+  res.status(500).json({ error: '데이터베이스 연결 오류. 잠시 후 다시 시도해주세요.' });
 });
 
 module.exports = router;
