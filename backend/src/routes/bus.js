@@ -100,4 +100,25 @@ router.get('/:id/children', authMiddleware, async (req, res) => {
   }
 });
 
+// 버스 상태 업데이트 (기사용)
+router.put('/:id/status', authMiddleware, roleMiddleware('driver'), async (req, res) => {
+  try {
+    const { status } = req.body;
+    
+    if (!['대기', '운행중'].includes(status)) {
+      return res.status(400).json({ error: '유효하지 않은 상태입니다' });
+    }
+
+    await db.execute(
+      'UPDATE buses SET status = ? WHERE id = ? AND driver_id = ?',
+      [status, req.params.id, req.user.id]
+    );
+
+    res.json({ message: '상태 업데이트 완료' });
+  } catch (err) {
+    console.error('버스 상태 업데이트 오류:', err);
+    res.status(500).json({ error: '서버 오류' });
+  }
+});
+
 module.exports = router;

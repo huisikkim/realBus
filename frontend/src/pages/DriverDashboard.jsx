@@ -23,7 +23,16 @@ function DriverDashboard() {
   useEffect(() => {
     if (bus) {
       loadBusChildren(bus.id);
-      setIsRunning(bus.status === '운행중');
+      // DB 상태가 '운행중'이어도 실제로는 종료된 상태일 수 있으므로
+      // 로그인 시에는 항상 '대기' 상태로 시작
+      setIsRunning(false);
+      
+      // 만약 DB에 '운행중'으로 남아있다면 '대기'로 초기화
+      if (bus.status === '운행중') {
+        api.put(`/bus/${bus.id}/status`, { status: '대기' }).catch(err => {
+          console.error('버스 상태 초기화 실패:', err);
+        });
+      }
     }
   }, [bus]);
 
@@ -152,13 +161,13 @@ function DriverDashboard() {
                     ? 'bg-emerald-50 text-safe-green border-emerald-100' 
                     : 'bg-slate-100 text-slate-500 border-slate-200'
                 }`}>
-                  {isRunning ? 'Running' : 'Standby'}
+                  {isRunning ? '운행중' : '대기'}
                 </span>
               </div>
               <p className="text-slate-500 font-semibold text-sm">최대 정원: {bus.capacity}명 | 현재 탑승: {children.length}명</p>
             </div>
             <div className="text-left md:text-right">
-              <p className="text-slate-400 text-xs font-bold mb-1 uppercase tracking-widest">Current Speed</p>
+              <p className="text-slate-400 text-xs font-bold mb-1 uppercase tracking-widest">현재 속도</p>
               <p className="text-3xl md:text-4xl font-black text-navy">
                 {currentLocation?.speed || 0} <span className="text-lg font-bold text-slate-400">km/h</span>
               </p>
