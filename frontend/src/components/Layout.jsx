@@ -1,4 +1,5 @@
 import { useAuth } from '../context/AuthContext';
+import NotificationBell from './NotificationBell';
 
 function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -25,6 +26,9 @@ function Layout({ children }) {
         </div>
         
         <div className="flex items-center gap-4 md:gap-8">
+          {/* 알림 벨 (부모만) */}
+          {user?.role === 'parent' && <NotificationBell />}
+          
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold text-navy">{user?.name}</p>

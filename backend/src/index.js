@@ -9,6 +9,7 @@ const childRoutes = require('./routes/child');
 const adminRoutes = require('./routes/admin');
 const stopRoutes = require('./routes/stop');
 const etaRoutes = require('./routes/eta');
+const notificationRoutes = require('./routes/notification');
 const { initSocket } = require('./socket');
 const db = require('./config/database');
 
@@ -38,6 +39,7 @@ app.use('/api/child', childRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/stop', stopRoutes);
 app.use('/api/eta', etaRoutes);
+app.use('/api/notification', notificationRoutes);
 
 // 헬스 체크
 app.get('/health', (req, res) => {

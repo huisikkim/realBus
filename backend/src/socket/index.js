@@ -111,6 +111,12 @@ function initSocket(io) {
         
         console.log(`승차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
         
+        // 알림 DB에 저장
+        await db.execute(
+          'INSERT INTO notifications (user_id, type, title, message, child_id, bus_id) VALUES (?, ?, ?, ?, ?, ?)',
+          [parentId, '승차', '승차 알림', `${childName}이(가) 버스에 탑승했습니다.`, childId, busId]
+        );
+        
         // 부모에게 직접 전송 (개인 룸으로만)
         io.to(`user:${parentId}`).emit('child:boarded', { 
           childId, 
@@ -145,6 +151,12 @@ function initSocket(io) {
         const childName = children[0]?.name;
         
         console.log(`하차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
+        
+        // 알림 DB에 저장
+        await db.execute(
+          'INSERT INTO notifications (user_id, type, title, message, child_id, bus_id) VALUES (?, ?, ?, ?, ?, ?)',
+          [parentId, '하차', '하차 알림', `${childName}이(가) 버스에서 하차했습니다.`, childId, busId]
+        );
         
         // 부모에게 직접 전송 (개인 룸으로만)
         io.to(`user:${parentId}`).emit('child:alighted', { 
