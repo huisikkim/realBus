@@ -5,7 +5,7 @@ const { executeWithRetry } = require('../utils/dbRetry');
 
 const router = express.Router();
 
-// 내 알림 목록 조회
+// 내 알림 목록 조회 (오늘 날짜만)
 router.get('/my', authMiddleware, async (req, res) => {
   try {
     const [notifications] = await executeWithRetry(() =>
@@ -15,6 +15,7 @@ router.get('/my', authMiddleware, async (req, res) => {
         LEFT JOIN children c ON n.child_id = c.id
         LEFT JOIN buses b ON n.bus_id = b.id
         WHERE n.user_id = ?
+        AND DATE(n.created_at) = CURDATE()
         ORDER BY n.created_at DESC
         LIMIT 50
       `, [req.user.id])
