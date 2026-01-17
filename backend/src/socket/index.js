@@ -53,7 +53,15 @@ function initSocket(io) {
       }
 
       // 해당 버스를 구독 중인 부모들에게 브로드캐스트
-      io.to(`bus:${busId}`).emit('bus:locationUpdate', locationData);
+      const roomName = `bus:${busId}`;
+      const room = io.sockets.adapter.rooms.get(roomName);
+      const subscriberCount = room ? room.size : 0;
+      
+      if (subscriberCount > 0) {
+        console.log(`위치 업데이트 브로드캐스트: ${roomName} (구독자 ${subscriberCount}명)`);
+      }
+      
+      io.to(roomName).emit('bus:locationUpdate', locationData);
     });
 
     // 기사: 운행 시작
@@ -94,11 +102,15 @@ function initSocket(io) {
       if (socket.user.role !== 'driver') return;
 
       const { childId, busId } = data;
+      console.log(`\n=== 승차 처리 시작 ===`);
+      console.log(`아이 ID: ${childId}, 버스 ID: ${busId}`);
+      
       try {
         await db.execute(
           'INSERT INTO boarding_log (child_id, bus_id, type) VALUES (?, ?, ?)',
           [childId, busId, '승차']
         );
+        console.log('✅ boarding_log 저장 완료');
         
         // 해당 아이의 부모 ID 조회
         const [children] = await db.execute(
@@ -106,27 +118,36 @@ function initSocket(io) {
           [childId]
         );
         
+        if (children.length === 0) {
+          console.error('❌ 아이 정보를 찾을 수 없음');
+          return;
+        }
+        
         const parentId = children[0]?.parent_id;
         const childName = children[0]?.name;
         
-        console.log(`승차 처리: 아이 ID ${childId}, 부모 ID ${parentId}, 버스 ID ${busId}`);
+        console.log(`부모 ID: ${parentId}, 아이 이름: ${childName}`);
         
         // 알림 DB에 저장
         await db.execute(
           'INSERT INTO notifications (user_id, type, title, message, child_id, bus_id) VALUES (?, ?, ?, ?, ?, ?)',
           [parentId, '승차', '승차 알림', `${childName}이(가) 버스에 탑승했습니다.`, childId, busId]
         );
+        console.log('✅ 알림 DB 저장 완료');
         
-        // 부모에게 직접 전송 (개인 룸으로만)
-        io.to(`user:${parentId}`).emit('child:boarded', { 
+        // 부모에게 직접 전송 (개인 룸으로)
+        const eventData = { 
           childId, 
           busId, 
           parentId,
           childName,
           time: new Date() 
-        });
+        };
+        console.log(`소켓 이벤트 전송: user:${parentId}`, eventData);
+        io.to(`user:${parentId}`).emit('child:boarded', eventData);
+        console.log('✅ 승차 처리 완료\n');
       } catch (err) {
-        console.error('승차 처리 오류:', err);
+        console.error('❌ 승차 처리 오류:', err);
       }
     });
 
@@ -176,13 +197,20 @@ function initSocket(io) {
       if (socket.user.role !== 'parent') return;
 
       const { busId } = data;
+      console.log(`\n=== 버스 구독 ===`);
+      console.log(`부모 ID: ${socket.user.id}, 버스 ID: ${busId}`);
       socket.join(`bus:${busId}`);
+      console.log(`✅ 버스 룸 참여 완료: bus:${busId}`);
 
       // 현재 위치 즉시 전송
       const currentLocation = busLocations.get(busId);
       if (currentLocation) {
+        console.log('현재 버스 위치 전송:', currentLocation);
         socket.emit('bus:locationUpdate', currentLocation);
+      } else {
+        console.log('현재 버스 위치 없음 (운행 중이 아님)');
       }
+      console.log('=================\n');
     });
 
     // 부모: 버스 구독 해제

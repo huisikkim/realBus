@@ -84,27 +84,23 @@ function ParentDashboard() {
     };
 
     const handleChildBoarded = async (data) => {
-      console.log('승차 이벤트 수신:', data);
+      console.log('=== 승차 이벤트 수신 ===', data);
       
       // 내 아이인지 확인
       if (data.parentId === user?.id) {
+        console.log(`내 아이(${data.childName}) 승차 확인`);
+        
+        // 알림 표시
+        alert(`${data.childName}이(가) 버스에 탑승했습니다.`);
+        
         // 아이 정보를 다시 로드하여 최신 상태 가져오기
         try {
           const res = await api.get('/child/my');
           const updatedChildren = res.data;
+          console.log('업데이트된 아이 목록:', updatedChildren.map(c => ({ id: c.id, name: c.name, status: c.boarding_status })));
           setChildren(updatedChildren);
           
-          // 승차한 아이 찾기
-          const child = updatedChildren.find(c => c.id === data.childId);
-          if (child) {
-            alert(`${child.name}이(가) 버스에 탑승했습니다.`);
-            
-            // 즉시 버스 구독
-            if (child.bus_id) {
-              console.log('승차 후 버스 구독:', child.bus_id);
-              socket.emit('parent:subscribeBus', { busId: child.bus_id });
-            }
-          }
+          // 버스 구독은 useEffect에서 자동으로 처리됨
         } catch (err) {
           console.error('아이 정보 로드 실패:', err);
           loadChildren();
@@ -169,9 +165,10 @@ function ParentDashboard() {
     const boardedChildren = children.filter(c => c.bus_id && c.boarding_status === '승차');
     const busIds = [...new Set(boardedChildren.map(c => c.bus_id))];
     
-    console.log('아이 목록:', children);
-    console.log('승차 중인 아이:', boardedChildren);
-    console.log('버스 구독 시도:', busIds);
+    console.log('=== 버스 구독 상태 ===');
+    console.log('전체 아이 목록:', children.map(c => ({ id: c.id, name: c.name, busId: c.bus_id, status: c.boarding_status })));
+    console.log('승차 중인 아이:', boardedChildren.map(c => ({ id: c.id, name: c.name, busId: c.bus_id })));
+    console.log('구독할 버스 ID:', busIds);
     
     // 승차 중인 아이가 없으면 위치 공유 중단
     if (busIds.length === 0) {
@@ -180,14 +177,15 @@ function ParentDashboard() {
       return;
     }
     
-    // 버스 구독
+    // 버스 구독 (각 버스마다)
     busIds.forEach(busId => {
-      console.log('버스 구독:', busId);
+      console.log(`버스 ${busId} 구독 요청 전송`);
       socket.emit('parent:subscribeBus', { busId });
     });
 
     // cleanup: 구독 해제
     return () => {
+      console.log('버스 구독 해제:', busIds);
       busIds.forEach(busId => {
         socket.emit('parent:unsubscribeBus', { busId });
       });
