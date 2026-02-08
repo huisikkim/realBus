@@ -1,5 +1,6 @@
-/* Tailwind CSS is loaded via CDN in index.html */
-/* This file contains minimal custom styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   margin: 0;
