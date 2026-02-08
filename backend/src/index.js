@@ -41,6 +41,23 @@ app.use('/api/stop', stopRoutes);
 app.use('/api/eta', etaRoutes);
 app.use('/api/notification', notificationRoutes);
 
+// 프론트엔드 정적 파일 서빙 (프로덕션 환경)
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+  
+  // 프론트엔드 빌드 파일 서빙
+  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+  
+  // SPA 라우팅 처리 (API 경로가 아닌 모든 요청을 index.html로)
+  app.get('*', (req, res) => {
+    // API 경로는 제외
+    if (req.path.startsWith('/api') || req.path === '/health') {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+  });
+}
+
 // 헬스 체크
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
