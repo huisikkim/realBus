@@ -17,7 +17,7 @@ function ChildCard({ child, etaData }) {
           {/* 상태 배지 */}
           {child.boarding_status === '승차' && (
             <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center shadow-md">
-              <span className="material-symbols-outlined text-white text-xs">check</span>
+              <span className="text-[10px]">✓</span>
             </div>
           )}
         </div>
@@ -29,7 +29,7 @@ function ChildCard({ child, etaData }) {
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-sm">directions_bus</span>
+            <span className="text-sm">🚌</span>
             <p className="text-slate-500 dark:text-slate-400 text-xs font-medium truncate">
               {child.bus_number ? `${child.bus_number}호 버스` : '버스 미배정'}
             </p>
@@ -52,7 +52,7 @@ function ChildCard({ child, etaData }) {
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900/50 dark:to-slate-800/50 rounded-2xl p-3 border border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-start gap-2 mb-2">
               <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-white text-sm">location_on</span>
+                <span className="text-sm">📍</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-slate-600 dark:text-slate-300 text-sm font-bold">{child.stop_name}</p>
@@ -64,7 +64,7 @@ function ChildCard({ child, etaData }) {
               <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl px-3 py-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-white text-base">schedule</span>
+                    <span className="text-base">⏱️</span>
                   </div>
                   <div className="flex-1">
                     <p className="text-amber-600 dark:text-amber-400 font-bold text-sm">

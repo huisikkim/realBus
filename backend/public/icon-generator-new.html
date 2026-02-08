@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>셔틀버스 안전 - 아이콘 생성기</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a2e;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+    h1 {
+      color: white;
+      margin: 0;
+    }
+    .icon-container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .icon-wrapper {
+      text-align: center;
+    }
+    .icon-wrapper p {
+      color: #888;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    canvas {
+      border-radius: 20%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <h1>🚌 셔틀버스 안전 - PWA 아이콘</h1>
+  
+  <div class="icon-container">
+    <div class="icon-wrapper">
+      <canvas id="icon192" width="192" height="192"></canvas>
+      <p>192x192</p>
+      <button onclick="downloadIcon('icon192', 'icon-192x192.png')">다운로드</button>
+    </div>
+    <div class="icon-wrapper">
+      <canvas id="icon512" width="512" height="512"></canvas>
+      <p>512x512</p>
+      <button onclick="downloadIcon('icon512', 'icon-512x512.png')">다운로드</button>
+    </div>
+    <div class="icon-wrapper">
+      <canvas id="apple" width="180" height="180"></canvas>
+      <p>Apple Touch Icon (180x180)</p>
+      <button onclick="downloadIcon('apple', 'apple-touch-icon.png')">다운로드</button>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const padding = size * 0.15;
+      
+      // 배경 - 다크 네이비
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, size, size);
+      
+      // 인스타그램 스타일 그라데이션 테두리
+      const borderWidth = size * 0.08;
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#a855f7');
+      gradient.addColorStop(0.5, '#ec4899');
+      gradient.addColorStop(1, '#fb923c');
+      
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = borderWidth;
+      ctx.shadowBlur = size * 0.05;
+      ctx.shadowColor = 'rgba(236, 72, 153, 0.6)';
+      
+      const radius = size * 0.22;
+      ctx.beginPath();
+      ctx.roundRect(borderWidth/2, borderWidth/2, size - borderWidth, size - borderWidth, radius);
+      ctx.stroke();
+      
+      // 그림자 리셋
+      ctx.shadowBlur = 0;
+      
+      // 버스 그리기
+      const busWidth = size * 0.45;
+      const busHeight = size * 0.35;
+      const busX = (size - busWidth) / 2;
+      const busY = (size - busHeight) / 2 - size * 0.05;
+      
+      // 버스 본체 - 그라데이션
+      const busGradient = ctx.createLinearGradient(busX, busY, busX, busY + busHeight);
+      busGradient.addColorStop(0, '#fef3c7');
+      busGradient.addColorStop(0.4, '#fbbf24');
+      busGradient.addColorStop(1, '#f97316');
+      
+      ctx.fillStyle = busGradient;
+      ctx.beginPath();
+      ctx.roundRect(busX, busY, busWidth, busHeight * 0.7, size * 0.03);
+      ctx.fill();
+      
+      // 버스 지붕
+      ctx.fillStyle = '#fef3c7';
+      ctx.beginPath();
+      ctx.roundRect(busX + busWidth * 0.15, busY - busHeight * 0.15, busWidth * 0.7, busHeight * 0.2, size * 0.02);
+      ctx.fill();
+      
+      // 지붕 경광등
+      const lightSize = size * 0.025;
+      ctx.fillStyle = '#fb923c';
+      ctx.fillRect(busX + busWidth * 0.2, busY - busHeight * 0.15, lightSize, lightSize);
+      ctx.fillRect(busX + busWidth * 0.75, busY - busHeight * 0.15, lightSize, lightSize);
+      
+      // 창문들
+      const windowWidth = busWidth * 0.18;
+      const windowHeight = busHeight * 0.35;
+      const windowY = busY + busHeight * 0.1;
+      const windowGap = busWidth * 0.02;
+      
+      ctx.fillStyle = '#7dd3fc';
+      for (let i = 0; i < 4; i++) {
+        const windowX = busX + busWidth * 0.08 + i * (windowWidth + windowGap);
+        ctx.fillRect(windowX, windowY, windowWidth, windowHeight);
+      }
+      
+      // 창문 프레임
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = size * 0.005;
+      for (let i = 0; i < 4; i++) {
+        const windowX = busX + busWidth * 0.08 + i * (windowWidth + windowGap);
+        ctx.strokeRect(windowX, windowY, windowWidth, windowHeight);
+      }
+      
+      // 바퀴
+      const wheelRadius = size * 0.055;
+      const wheelY = busY + busHeight * 0.75;
+      const wheelLeftX = busX + busWidth * 0.25;
+      const wheelRightX = busX + busWidth * 0.75;
+      
+      // 바퀴 그림자
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.beginPath();
+      ctx.arc(wheelLeftX, wheelY + wheelRadius * 0.2, wheelRadius * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(wheelRightX, wheelY + wheelRadius * 0.2, wheelRadius * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 바퀴 타이어
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(wheelLeftX, wheelY, wheelRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(wheelRightX, wheelY, wheelRadius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 바퀴 휠
+      const wheelGradient = ctx.createRadialGradient(wheelLeftX, wheelY, 0, wheelLeftX, wheelY, wheelRadius * 0.7);
+      wheelGradient.addColorStop(0, '#94a3b8');
+      wheelGradient.addColorStop(1, '#475569');
+      
+      ctx.fillStyle = wheelGradient;
+      ctx.beginPath();
+      ctx.arc(wheelLeftX, wheelY, wheelRadius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(wheelRightX, wheelY, wheelRadius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 휠 중심
+      ctx.fillStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.arc(wheelLeftX, wheelY, wheelRadius * 0.25, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(wheelRightX, wheelY, wheelRadius * 0.25, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 전조등
+      ctx.fillStyle = '#fef3c7';
+      const headlightSize = size * 0.02;
+      ctx.fillRect(busX + busWidth * 0.05, busY + busHeight * 0.45, headlightSize, headlightSize * 0.6);
+    }
+    
+    // 모든 캔버스에 아이콘 그리기
+    ['icon192', 'icon512', 'apple'].forEach(id => {
+      const canvas = document.getElementById(id);
+      drawIcon(canvas);
+    });
+    
+    function downloadIcon(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>

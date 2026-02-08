@@ -30,7 +30,7 @@ function AddChildModal({ isOpen, onClose, buses, stops, onLoadStops, onSubmit })
             onClick={onClose}
             className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
           >
-            <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
+            <span className="text-slate-500 dark:text-slate-400 text-xl">✕</span>
           </button>
           <h3 className="text-center text-base font-bold text-slate-900 dark:text-white">새 아이 등록</h3>
         </div>

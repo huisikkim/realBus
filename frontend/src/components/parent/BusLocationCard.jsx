@@ -40,7 +40,7 @@ function BusLocationCard({ busLocation, connected, children }) {
             <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-xl p-3 shadow-xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-emerald-500 text-lg">speed</span>
+                  <span className="text-lg">⚡</span>
                   <span className="text-slate-900 dark:text-white font-bold text-sm">{busLocation.speed || 0} km/h</span>
                 </div>
                 <span className="text-slate-500 dark:text-slate-400 text-[10px]">실시간 추적 중</span>
@@ -58,7 +58,7 @@ function BusLocationCard({ busLocation, connected, children }) {
         <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
           <div className="text-center px-6">
             <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center shadow-lg">
-              <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">location_off</span>
+              <span className="text-4xl">📍</span>
             </div>
             <p className="text-slate-600 dark:text-slate-300 font-bold text-base mb-1">
               {children.length === 0 
