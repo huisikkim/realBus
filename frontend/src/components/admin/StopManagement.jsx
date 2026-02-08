@@ -120,31 +120,33 @@ function StopManagement({ buses, onDataChange }) {
         ) : (
           <div className="space-y-3">
             {stops.map((stop, index) => (
-              <div key={stop.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-slate-200 dark:hover:border-slate-600 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-safe-green dark:bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-lg shadow-md">
-                    {index + 1}
+              <div key={stop.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 transition-all">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="w-10 h-10 bg-safe-green dark:bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-lg shadow-md flex-shrink-0">
+                      {index + 1}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-lg font-extrabold text-navy dark:text-blue-400">{stop.name}</h4>
+                      <p className="text-slate-400 dark:text-slate-500 text-xs font-medium">
+                        {parseFloat(stop.latitude).toFixed(6)}, {parseFloat(stop.longitude).toFixed(6)}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-lg font-extrabold text-navy dark:text-blue-400">{stop.name}</h4>
-                    <p className="text-slate-400 dark:text-slate-500 text-xs font-medium">
-                      {parseFloat(stop.latitude).toFixed(6)}, {parseFloat(stop.longitude).toFixed(6)}
-                    </p>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => openStopModal(stop)}
+                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm transition-all"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => deleteStop(stop.id)}
+                      className="px-4 py-2 rounded-lg bg-action-red dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white font-bold text-sm transition-all"
+                    >
+                      삭제
+                    </button>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openStopModal(stop)}
-                    className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm transition-all"
-                  >
-                    수정
-                  </button>
-                  <button
-                    onClick={() => deleteStop(stop.id)}
-                    className="px-4 py-2 rounded-lg bg-action-red dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white font-bold text-sm transition-all"
-                  >
-                    삭제
-                  </button>
                 </div>
               </div>
             ))}

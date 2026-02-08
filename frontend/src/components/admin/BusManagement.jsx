@@ -67,31 +67,33 @@ function BusManagement({ buses, drivers, onDataChange }) {
         ) : (
           <div className="space-y-3">
             {buses.map(bus => (
-              <div key={bus.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-slate-200 dark:hover:border-slate-600 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-navy dark:bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md">
-                    <span className="material-symbols-outlined">directions_bus</span>
+              <div key={bus.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 transition-all">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="w-12 h-12 bg-navy dark:bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                      <span className="material-symbols-outlined">directions_bus</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-lg font-extrabold text-navy dark:text-blue-400">{bus.bus_number}호 버스</h4>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                        기사: {bus.driver_name || '미배정'} · 정원: {bus.capacity}명
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-lg font-extrabold text-navy dark:text-blue-400">{bus.bus_number}호 버스</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-                      기사: {bus.driver_name || '미배정'} · 정원: {bus.capacity}명
-                    </p>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => openBusModal(bus)}
+                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm transition-all"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => deleteBus(bus.id)}
+                      className="px-4 py-2 rounded-lg bg-action-red dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white font-bold text-sm transition-all"
+                    >
+                      삭제
+                    </button>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openBusModal(bus)}
-                    className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm transition-all"
-                  >
-                    수정
-                  </button>
-                  <button
-                    onClick={() => deleteBus(bus.id)}
-                    className="px-4 py-2 rounded-lg bg-action-red dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white font-bold text-sm transition-all"
-                  >
-                    삭제
-                  </button>
                 </div>
               </div>
             ))}
