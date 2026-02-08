@@ -27,7 +27,7 @@ function Layout({ children }) {
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-base md:text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent tracking-tight">셔틀버스 안전</h1>
+            <h1 className="text-sm md:text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent tracking-tight leading-tight">셔틀버스안전</h1>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden md:block">Kids Safe Transportation</p>
           </div>
         </div>
