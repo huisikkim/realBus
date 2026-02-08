@@ -12,10 +12,8 @@ const dbConfig = {
   // 연결 유지 및 재연결 설정
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
-  // 타임아웃 설정
-  connectTimeout: 60000, // 60초
-  acquireTimeout: 60000,
-  timeout: 60000
+  // 타임아웃 설정 (MySQL2에서 지원하는 옵션만 사용)
+  connectTimeout: 60000 // 60초
 };
 
 // SSL 설정이 필요한 경우 (Aiven 등)
@@ -29,7 +27,7 @@ const pool = mysql.createPool(dbConfig);
 
 // 연결 테스트 및 에러 핸들링 (개발 환경에서만 로그 출력)
 if (process.env.NODE_ENV === 'development' && process.env.DB_DEBUG === 'true') {
-  pool.on('connection', (connection) => {
+  pool.on('connection', () => {
     console.log('새 DB 연결 생성됨');
   });
 
