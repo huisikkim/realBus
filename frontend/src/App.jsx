@@ -12,7 +12,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="loading-screen">
+      <div className="loading-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
         <div className="spinner"></div>
         <p>로딩 중...</p>
       </div>

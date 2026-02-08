@@ -89,10 +89,10 @@ function DriverDashboard() {
   if (loading) {
     return (
       <main className="max-w-5xl mx-auto p-10">
-        <section className="bg-white rounded-large shadow-sm border border-slate-200 p-8">
+        <section className="bg-white dark:bg-slate-800 rounded-large shadow-sm border border-slate-200 dark:border-slate-700 p-8">
           <div className="text-center py-16">
-            <span className="material-symbols-outlined text-6xl text-slate-300 mb-4 animate-pulse">directions_bus</span>
-            <p className="text-slate-500 font-semibold text-lg">버스 정보를 불러오는 중...</p>
+            <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-4 animate-pulse">directions_bus</span>
+            <p className="text-slate-500 dark:text-slate-400 font-semibold text-lg">버스 정보를 불러오는 중...</p>
           </div>
         </section>
       </main>
@@ -103,11 +103,11 @@ function DriverDashboard() {
   if (!bus) {
     return (
       <main className="max-w-5xl mx-auto p-10">
-        <section className="bg-white rounded-large shadow-sm border border-slate-200 p-8">
+        <section className="bg-white dark:bg-slate-800 rounded-large shadow-sm border border-slate-200 dark:border-slate-700 p-8">
           <div className="text-center py-16">
-            <span className="material-symbols-outlined text-6xl text-slate-300 mb-4">directions_bus</span>
-            <p className="text-slate-500 font-semibold text-lg">배정된 버스가 없습니다.</p>
-            <p className="text-slate-400 text-sm mt-2">관리자에게 문의해주세요.</p>
+            <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-4">directions_bus</span>
+            <p className="text-slate-500 dark:text-slate-400 font-semibold text-lg">배정된 버스가 없습니다.</p>
+            <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">관리자에게 문의해주세요.</p>
           </div>
         </section>
       </main>

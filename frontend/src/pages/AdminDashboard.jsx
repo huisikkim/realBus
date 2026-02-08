@@ -181,7 +181,7 @@ function AdminDashboard() {
   return (
     <main className="max-w-5xl mx-auto p-6 md:p-10 space-y-6">
       {/* 탭 네비게이션 */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-2">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-2">
         <div className="flex gap-2">
           {tabs.map(t => (
             <button
@@ -189,8 +189,8 @@ function AdminDashboard() {
               onClick={() => setTab(t.id)}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
                 tab === t.id
-                  ? 'bg-navy text-white shadow-md'
-                  : 'text-slate-500 hover:bg-slate-100'
+                  ? 'bg-navy dark:bg-blue-600 text-white shadow-md'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
               <span className="material-symbols-outlined text-lg">{t.icon}</span>
@@ -202,15 +202,15 @@ function AdminDashboard() {
 
       {/* 버스 관리 */}
       {tab === 'buses' && (
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+        <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-xl md:text-2xl font-extrabold text-navy">버스 목록</h2>
-              <p className="text-slate-500 font-medium text-sm">등록된 버스를 관리합니다.</p>
+              <h2 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">버스 목록</h2>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">등록된 버스를 관리합니다.</p>
             </div>
             <button
               onClick={() => openBusModal()}
-              className="bg-navy hover:bg-navy-dark text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-md"
+              className="bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-md"
             >
               <span className="material-symbols-outlined text-lg">add</span>
               버스 추가
@@ -219,20 +219,20 @@ function AdminDashboard() {
 
           {buses.length === 0 ? (
             <div className="text-center py-12">
-              <span className="material-symbols-outlined text-6xl text-slate-300 mb-3">directions_bus</span>
-              <p className="text-slate-500 font-semibold">등록된 버스가 없습니다</p>
+              <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">directions_bus</span>
+              <p className="text-slate-500 dark:text-slate-400 font-semibold">등록된 버스가 없습니다</p>
             </div>
           ) : (
             <div className="space-y-3">
               {buses.map(bus => (
-                <div key={bus.id} className="bg-slate-50 rounded-2xl p-5 border border-slate-100 flex items-center justify-between hover:border-slate-200 transition-all">
+                <div key={bus.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-slate-200 dark:hover:border-slate-600 transition-all">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-navy text-white rounded-xl flex items-center justify-center shadow-md">
+                    <div className="w-12 h-12 bg-navy dark:bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md">
                       <span className="material-symbols-outlined">directions_bus</span>
                     </div>
                     <div>
-                      <h4 className="text-lg font-extrabold text-navy">{bus.bus_number}호 버스</h4>
-                      <p className="text-slate-500 text-sm font-medium">
+                      <h4 className="text-lg font-extrabold text-navy dark:text-blue-400">{bus.bus_number}호 버스</h4>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
                         기사: {bus.driver_name || '미배정'} · 정원: {bus.capacity}명
                       </p>
                     </div>
@@ -240,13 +240,13 @@ function AdminDashboard() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => openBusModal(bus)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold text-sm transition-all"
+                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm transition-all"
                     >
                       수정
                     </button>
                     <button
                       onClick={() => deleteBus(bus.id)}
-                      className="px-4 py-2 rounded-lg bg-action-red hover:bg-red-600 text-white font-bold text-sm transition-all"
+                      className="px-4 py-2 rounded-lg bg-action-red dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white font-bold text-sm transition-all"
                     >
                       삭제
                     </button>
@@ -260,17 +260,17 @@ function AdminDashboard() {
 
       {/* 정류장 관리 */}
       {tab === 'stops' && (
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+        <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div>
-              <h2 className="text-xl md:text-2xl font-extrabold text-navy">정류장 관리</h2>
-              <p className="text-slate-500 font-medium text-sm">버스별 정류장을 등록하고 관리합니다.</p>
+              <h2 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">정류장 관리</h2>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">버스별 정류장을 등록하고 관리합니다.</p>
             </div>
             <div className="flex gap-3 w-full md:w-auto">
               <select
                 value={selectedBusForStops}
                 onChange={(e) => setSelectedBusForStops(e.target.value)}
-                className="flex-1 md:flex-none px-4 py-2.5 rounded-xl border border-slate-200 font-medium bg-white focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none"
+                className="flex-1 md:flex-none px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 font-medium bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none"
               >
                 <option value="">버스 선택</option>
                 {buses.map(bus => (
@@ -280,7 +280,7 @@ function AdminDashboard() {
               <button
                 onClick={() => openStopModal()}
                 disabled={!selectedBusForStops}
-                className="bg-navy hover:bg-navy-dark disabled:bg-slate-300 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-md"
+                className="bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-md"
               >
                 <span className="material-symbols-outlined text-lg">add_location</span>
                 <span className="hidden sm:inline">정류장 추가</span>
@@ -290,25 +290,25 @@ function AdminDashboard() {
 
           {!selectedBusForStops ? (
             <div className="text-center py-12">
-              <span className="material-symbols-outlined text-6xl text-slate-300 mb-3">map</span>
-              <p className="text-slate-500 font-semibold">버스를 선택해주세요</p>
+              <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">map</span>
+              <p className="text-slate-500 dark:text-slate-400 font-semibold">버스를 선택해주세요</p>
             </div>
           ) : stops.length === 0 ? (
             <div className="text-center py-12">
-              <span className="material-symbols-outlined text-6xl text-slate-300 mb-3">location_off</span>
-              <p className="text-slate-500 font-semibold">등록된 정류장이 없습니다</p>
+              <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">location_off</span>
+              <p className="text-slate-500 dark:text-slate-400 font-semibold">등록된 정류장이 없습니다</p>
             </div>
           ) : (
             <div className="space-y-3">
               {stops.map((stop, index) => (
-                <div key={stop.id} className="bg-slate-50 rounded-2xl p-5 border border-slate-100 flex items-center justify-between hover:border-slate-200 transition-all">
+                <div key={stop.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-slate-200 dark:hover:border-slate-600 transition-all">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-safe-green text-white rounded-full flex items-center justify-center font-black text-lg shadow-md">
+                    <div className="w-10 h-10 bg-safe-green dark:bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-lg shadow-md">
                       {index + 1}
                     </div>
                     <div>
-                      <h4 className="text-lg font-extrabold text-navy">{stop.name}</h4>
-                      <p className="text-slate-400 text-xs font-medium">
+                      <h4 className="text-lg font-extrabold text-navy dark:text-blue-400">{stop.name}</h4>
+                      <p className="text-slate-400 dark:text-slate-500 text-xs font-medium">
                         {parseFloat(stop.latitude).toFixed(6)}, {parseFloat(stop.longitude).toFixed(6)}
                       </p>
                     </div>
@@ -316,13 +316,13 @@ function AdminDashboard() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => openStopModal(stop)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-bold text-sm transition-all"
+                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm transition-all"
                     >
                       수정
                     </button>
                     <button
                       onClick={() => deleteStop(stop.id)}
-                      className="px-4 py-2 rounded-lg bg-action-red hover:bg-red-600 text-white font-bold text-sm transition-all"
+                      className="px-4 py-2 rounded-lg bg-action-red dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white font-bold text-sm transition-all"
                     >
                       삭제
                     </button>
@@ -336,22 +336,22 @@ function AdminDashboard() {
 
       {/* 사용자 관리 */}
       {tab === 'users' && (
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+        <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
           <div className="mb-6">
-            <h2 className="text-xl md:text-2xl font-extrabold text-navy">사용자 목록</h2>
-            <p className="text-slate-500 font-medium text-sm">사용자 역할을 관리합니다.</p>
+            <h2 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">사용자 목록</h2>
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">사용자 역할을 관리합니다.</p>
           </div>
 
           <div className="space-y-3">
             {users.map(user => (
-              <div key={user.id} className="bg-slate-50 rounded-2xl p-5 border border-slate-100 flex items-center justify-between hover:border-slate-200 transition-all">
+              <div key={user.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-slate-200 dark:hover:border-slate-600 transition-all">
                 <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <div className="w-12 h-12 bg-navy text-white rounded-xl flex items-center justify-center text-lg font-black shadow-md flex-shrink-0">
+                  <div className="w-12 h-12 bg-navy dark:bg-blue-600 text-white rounded-xl flex items-center justify-center text-lg font-black shadow-md flex-shrink-0">
                     {user.name.charAt(0)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h4 className="text-lg font-extrabold text-navy truncate">{user.name}</h4>
-                    <p className="text-slate-500 text-sm font-medium truncate">{user.email}</p>
+                    <h4 className="text-lg font-extrabold text-navy dark:text-blue-400 truncate">{user.name}</h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium truncate">{user.email}</p>
                   </div>
                 </div>
                 <select
@@ -359,10 +359,10 @@ function AdminDashboard() {
                   onChange={(e) => handleRoleChange(user.id, e.target.value)}
                   className={`px-4 py-2 rounded-lg font-bold text-sm border-2 outline-none transition-all flex-shrink-0 w-28 ${
                     user.role === 'admin' 
-                      ? 'border-action-red bg-red-50 text-action-red'
+                      ? 'border-action-red dark:border-red-600 bg-red-50 dark:bg-red-900/20 text-action-red dark:text-red-400'
                       : user.role === 'driver'
-                      ? 'border-safe-green bg-emerald-50 text-safe-green'
-                      : 'border-slate-200 bg-white text-slate-600'
+                      ? 'border-safe-green dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 text-safe-green dark:text-emerald-400'
+                      : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   <option value="parent">학부모</option>
@@ -377,34 +377,34 @@ function AdminDashboard() {
 
       {/* 아이 관리 */}
       {tab === 'children' && (
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+        <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
           <div className="mb-6">
-            <h2 className="text-xl md:text-2xl font-extrabold text-navy">아이 목록</h2>
-            <p className="text-slate-500 font-medium text-sm">아이의 버스와 정류장을 배정합니다.</p>
+            <h2 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">아이 목록</h2>
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">아이의 버스와 정류장을 배정합니다.</p>
           </div>
 
           {children.length === 0 ? (
             <div className="text-center py-12">
-              <span className="material-symbols-outlined text-6xl text-slate-300 mb-3">child_care</span>
-              <p className="text-slate-500 font-semibold">등록된 아이가 없습니다</p>
+              <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">child_care</span>
+              <p className="text-slate-500 dark:text-slate-400 font-semibold">등록된 아이가 없습니다</p>
             </div>
           ) : (
             <div className="space-y-3">
               {children.map(child => (
-                <div key={child.id} className="bg-slate-50 rounded-2xl p-5 border border-slate-100 hover:border-slate-200 transition-all">
+                <div key={child.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 transition-all">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-navy text-white rounded-xl flex items-center justify-center text-lg font-black shadow-md">
+                      <div className="w-12 h-12 bg-navy dark:bg-blue-600 text-white rounded-xl flex items-center justify-center text-lg font-black shadow-md">
                         {child.name.charAt(0)}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="text-lg font-extrabold text-navy">{child.name}</h4>
-                          <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{child.age}세</span>
+                          <h4 className="text-lg font-extrabold text-navy dark:text-blue-400">{child.name}</h4>
+                          <span className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded text-xs font-bold">{child.age}세</span>
                         </div>
-                        <p className="text-slate-500 text-sm font-medium">보호자: {child.parent_name}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">보호자: {child.parent_name}</p>
                         {child.stop_name && (
-                          <p className="text-slate-400 text-xs font-medium flex items-center gap-1 mt-1">
+                          <p className="text-slate-400 dark:text-slate-500 text-xs font-medium flex items-center gap-1 mt-1">
                             <span className="material-symbols-outlined text-sm">location_on</span>
                             {child.stop_name}
                           </p>
@@ -415,7 +415,7 @@ function AdminDashboard() {
                       <select
                         value={child.bus_id || ''}
                         onChange={(e) => assignChildBus(child.id, e.target.value)}
-                        className="px-3 py-2 rounded-lg border border-slate-200 font-medium text-sm bg-white focus:border-navy outline-none"
+                        className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 font-medium text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 outline-none"
                       >
                         <option value="">버스 미배정</option>
                         {buses.map(bus => (
@@ -426,7 +426,7 @@ function AdminDashboard() {
                         value={child.stop_id || ''}
                         onChange={(e) => assignChildStop(child.id, e.target.value)}
                         disabled={!child.bus_id}
-                        className="px-3 py-2 rounded-lg border border-slate-200 font-medium text-sm bg-white focus:border-navy outline-none disabled:bg-slate-100 disabled:text-slate-400"
+                        className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 font-medium text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 outline-none disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400 dark:disabled:text-slate-600"
                       >
                         <option value="">정류장 미배정</option>
                         {allStops.filter(s => s.bus_id === child.bus_id).map(stop => (
@@ -445,34 +445,34 @@ function AdminDashboard() {
       {/* 버스 추가/수정 모달 */}
       {showBusModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 md:p-8 w-full max-w-md shadow-2xl">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-extrabold text-navy">{editingBus ? '버스 수정' : '버스 추가'}</h3>
+              <h3 className="text-xl font-extrabold text-navy dark:text-blue-400">{editingBus ? '버스 수정' : '버스 추가'}</h3>
               <button
                 onClick={() => setShowBusModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center transition-colors"
               >
-                <span className="material-symbols-outlined text-slate-500">close</span>
+                <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">버스 번호</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">버스 번호</label>
                 <input
                   type="text"
                   placeholder="예: 1"
                   value={busForm.busNumber}
                   onChange={(e) => setBusForm({ ...busForm, busNumber: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">기사 배정</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">기사 배정</label>
                 <select
                   value={busForm.driverId}
                   onChange={(e) => setBusForm({ ...busForm, driverId: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium bg-white"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium"
                 >
                   <option value="">기사 선택 (선택사항)</option>
                   {drivers.map(d => (
@@ -481,12 +481,12 @@ function AdminDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">정원</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">정원</label>
                 <input
                   type="number"
                   value={busForm.capacity}
                   onChange={(e) => setBusForm({ ...busForm, capacity: parseInt(e.target.value) || 15 })}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium"
                 />
               </div>
             </div>
@@ -494,13 +494,13 @@ function AdminDashboard() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowBusModal(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all"
+                className="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
               >
                 취소
               </button>
               <button
                 onClick={saveBus}
-                className="flex-1 py-3 rounded-xl font-bold text-white bg-navy hover:bg-navy-dark transition-all shadow-md"
+                className="flex-1 py-3 rounded-xl font-bold text-white bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 transition-all shadow-md"
               >
                 저장
               </button>
@@ -512,14 +512,14 @@ function AdminDashboard() {
       {/* 정류장 추가/수정 모달 */}
       {showStopModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 md:p-8 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-extrabold text-navy">{editingStop ? '정류장 수정' : '정류장 추가'}</h3>
+              <h3 className="text-xl font-extrabold text-navy dark:text-blue-400">{editingStop ? '정류장 수정' : '정류장 추가'}</h3>
               <button
                 onClick={() => setShowStopModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center transition-colors"
               >
-                <span className="material-symbols-outlined text-slate-500">close</span>
+                <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
               </button>
             </div>
 
@@ -531,12 +531,12 @@ function AdminDashboard() {
 
             <div className="space-y-4 mt-4">
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">버스</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">버스</label>
                 <select
                   value={stopForm.busId}
                   onChange={(e) => setStopForm({ ...stopForm, busId: e.target.value })}
                   disabled={editingStop}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium bg-white disabled:bg-slate-100"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium disabled:bg-slate-100 dark:disabled:bg-slate-800"
                 >
                   <option value="">버스 선택</option>
                   {buses.map(bus => (
@@ -545,46 +545,46 @@ function AdminDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">정류장 이름</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">정류장 이름</label>
                 <input
                   type="text"
                   placeholder="예: OO아파트 앞"
                   value={stopForm.name}
                   onChange={(e) => setStopForm({ ...stopForm, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-bold text-slate-600 mb-1.5">위도</label>
+                  <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">위도</label>
                   <input
                     type="number"
                     step="any"
                     placeholder="37.5665"
                     value={stopForm.latitude}
                     onChange={(e) => setStopForm({ ...stopForm, latitude: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-600 mb-1.5">경도</label>
+                  <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">경도</label>
                   <input
                     type="number"
                     step="any"
                     placeholder="126.9780"
                     value={stopForm.longitude}
                     onChange={(e) => setStopForm({ ...stopForm, longitude: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">순서</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">순서</label>
                 <input
                   type="number"
                   value={stopForm.stopOrder}
                   onChange={(e) => setStopForm({ ...stopForm, stopOrder: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none font-medium"
                 />
               </div>
             </div>
@@ -592,13 +592,13 @@ function AdminDashboard() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowStopModal(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all"
+                className="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
               >
                 취소
               </button>
               <button
                 onClick={saveStop}
-                className="flex-1 py-3 rounded-xl font-bold text-white bg-navy hover:bg-navy-dark transition-all shadow-md"
+                className="flex-1 py-3 rounded-xl font-bold text-white bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 transition-all shadow-md"
               >
                 저장
               </button>

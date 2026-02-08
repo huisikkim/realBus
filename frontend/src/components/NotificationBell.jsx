@@ -85,12 +85,12 @@ function NotificationBell() {
 
   const getNotificationColor = (type) => {
     switch (type) {
-      case '승차': return 'text-safe-green';
-      case '하차': return 'text-slate-500';
-      case '운행시작': return 'text-blue-500';
-      case '운행종료': return 'text-slate-500';
-      case '비상': return 'text-rose-500';
-      default: return 'text-slate-500';
+      case '승차': return 'text-safe-green dark:text-emerald-400';
+      case '하차': return 'text-slate-500 dark:text-slate-400';
+      case '운행시작': return 'text-blue-500 dark:text-blue-400';
+      case '운행종료': return 'text-slate-500 dark:text-slate-400';
+      case '비상': return 'text-rose-500 dark:text-rose-400';
+      default: return 'text-slate-500 dark:text-slate-400';
     }
   };
 
@@ -102,11 +102,11 @@ function NotificationBell() {
           setShowDropdown(!showDropdown);
           if (!showDropdown) loadNotifications();
         }}
-        className="relative p-2 rounded-full hover:bg-slate-100 transition-colors"
+        className="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
       >
-        <span className="material-symbols-outlined text-2xl text-slate-600">notifications</span>
+        <span className="material-symbols-outlined text-2xl text-slate-600 dark:text-slate-300">notifications</span>
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 bg-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute top-0 right-0 bg-rose-500 dark:bg-rose-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -122,19 +122,19 @@ function NotificationBell() {
           />
           
           {/* 모바일: 전체 화면, 데스크톱: 드롭다운 */}
-          <div className="fixed md:absolute left-0 right-0 md:left-auto md:right-0 bottom-0 md:bottom-auto md:top-full mt-0 md:mt-2 w-full md:w-96 bg-white md:rounded-xl rounded-t-3xl md:rounded-t-xl shadow-2xl border-t md:border border-slate-200 z-50 max-h-[80vh] md:max-h-[500px] overflow-hidden flex flex-col">
+          <div className="fixed md:absolute left-0 right-0 md:left-auto md:right-0 bottom-0 md:bottom-auto md:top-full mt-0 md:mt-2 w-full md:w-96 bg-white dark:bg-slate-800 md:rounded-xl rounded-t-3xl md:rounded-t-xl shadow-2xl border-t md:border border-slate-200 dark:border-slate-700 z-50 max-h-[80vh] md:max-h-[500px] overflow-hidden flex flex-col">
             {/* 모바일 핸들 */}
-            <div className="md:hidden flex justify-center py-2 border-b border-slate-200">
-              <div className="w-12 h-1 bg-slate-300 rounded-full"></div>
+            <div className="md:hidden flex justify-center py-2 border-b border-slate-200 dark:border-slate-700">
+              <div className="w-12 h-1 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
             </div>
 
             {/* 헤더 */}
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="font-bold text-navy text-lg">알림</h3>
+            <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <h3 className="font-bold text-navy dark:text-blue-400 text-lg">알림</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold"
                 >
                   모두 읽음
                 </button>
@@ -145,16 +145,16 @@ function NotificationBell() {
             <div className="overflow-y-auto flex-1">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <span className="material-symbols-outlined text-5xl text-slate-300 mb-2">notifications_off</span>
-                  <p className="text-slate-400 font-medium">알림이 없습니다</p>
+                  <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-2">notifications_off</span>
+                  <p className="text-slate-400 dark:text-slate-500 font-medium">알림이 없습니다</p>
                 </div>
               ) : (
                 notifications.map(notif => (
                   <div
                     key={notif.id}
                     onClick={() => !notif.is_read && markAsRead(notif.id)}
-                    className={`p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors ${
-                      !notif.is_read ? 'bg-blue-50' : ''
+                    className={`p-4 border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-colors ${
+                      !notif.is_read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -163,13 +163,13 @@ function NotificationBell() {
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-bold text-navy text-sm">{notif.title}</h4>
+                          <h4 className="font-bold text-navy dark:text-blue-400 text-sm">{notif.title}</h4>
                           {!notif.is_read && (
-                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></span>
                           )}
                         </div>
-                        <p className="text-slate-600 text-sm">{notif.message}</p>
-                        <p className="text-slate-400 text-xs mt-1">{formatTime(notif.created_at)}</p>
+                        <p className="text-slate-600 dark:text-slate-300 text-sm">{notif.message}</p>
+                        <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">{formatTime(notif.created_at)}</p>
                       </div>
                     </div>
                   </div>

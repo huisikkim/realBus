@@ -216,37 +216,37 @@ function ParentDashboard() {
   return (
     <main className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
       {/* 버스 위치 섹션 */}
-      <section className="bg-white rounded-large shadow-sm border border-slate-200 overflow-hidden">
+      <section className="bg-white dark:bg-slate-800 rounded-large shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="p-6 md:p-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl md:text-2xl font-extrabold text-navy">실시간 버스 위치</h2>
-              <p className="text-slate-500 font-medium text-sm">우리 아이가 탑승한 버스의 현재 위치입니다.</p>
+              <h2 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">실시간 버스 위치</h2>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">우리 아이가 탑승한 버스의 현재 위치입니다.</p>
             </div>
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold flex-shrink-0 ${
-              connected ? 'bg-emerald-50 text-safe-green' : 'bg-slate-100 text-slate-500'
+              connected ? 'bg-emerald-50 dark:bg-emerald-900/30 text-safe-green dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
             }`}>
-              <span className={`w-2 h-2 rounded-full ${connected ? 'bg-safe-green animate-pulse' : 'bg-slate-400'}`}></span>
+              <span className={`w-2 h-2 rounded-full ${connected ? 'bg-safe-green dark:bg-emerald-400 animate-pulse' : 'bg-slate-400'}`}></span>
               {connected ? '연결' : '연결 중'}
             </div>
           </div>
 
-          <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden border border-slate-200 shadow-inner">
+          <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner">
             {busLocation && children.some(c => c.boarding_status === '승차') ? (
               <>
                 <KakaoMap latitude={busLocation.latitude} longitude={busLocation.longitude} />
-                <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm">
                   <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 bg-safe-green rounded-full animate-pulse"></span>
-                    <span className="text-sm font-bold text-navy">속도: {busLocation.speed || 0} km/h</span>
+                    <span className="w-2 h-2 bg-safe-green dark:bg-emerald-400 rounded-full animate-pulse"></span>
+                    <span className="text-sm font-bold text-navy dark:text-blue-400">속도: {busLocation.speed || 0} km/h</span>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+              <div className="w-full h-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
-                  <span className="material-symbols-outlined text-6xl text-slate-300 mb-3">location_off</span>
-                  <p className="text-slate-500 font-semibold">
+                  <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">location_off</span>
+                  <p className="text-slate-500 dark:text-slate-400 font-semibold">
                     {children.length === 0 
                       ? '등록된 아이가 없습니다'
                       : children.some(c => c.bus_id) 
@@ -254,7 +254,7 @@ function ParentDashboard() {
                         : '버스가 배정되지 않았습니다'
                     }
                   </p>
-                  <p className="text-slate-400 text-sm mt-1">
+                  <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
                     {children.some(c => c.bus_id) 
                       ? '아이가 탑승하면 실시간 위치가 표시됩니다'
                       : '아이에게 버스를 배정해주세요'
@@ -268,15 +268,15 @@ function ParentDashboard() {
       </section>
 
       {/* 내 아이 섹션 */}
-      <section className="bg-white rounded-large shadow-sm border border-slate-200 p-6 md:p-8">
+      <section className="bg-white dark:bg-slate-800 rounded-large shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h3 className="text-xl md:text-2xl font-extrabold text-navy">내 아이</h3>
-            <p className="text-slate-500 font-medium text-sm">등록된 아이의 탑승 상태를 확인하세요.</p>
+            <h3 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">내 아이</h3>
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">등록된 아이의 탑승 상태를 확인하세요.</p>
           </div>
           <button 
             onClick={() => setShowAddModal(true)}
-            className="bg-navy hover:bg-navy-dark text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-md shadow-navy/10"
+            className="bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-md shadow-navy/10 dark:shadow-blue-600/10"
           >
             <span className="material-symbols-outlined text-lg">add</span>
             아이 등록
@@ -285,43 +285,43 @@ function ParentDashboard() {
 
         {children.length === 0 ? (
           <div className="text-center py-12">
-            <span className="material-symbols-outlined text-6xl text-slate-300 mb-3">child_care</span>
-            <p className="text-slate-500 font-semibold">등록된 아이가 없습니다</p>
-            <p className="text-slate-400 text-sm mt-1">아이를 등록하고 버스를 배정해주세요</p>
+            <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">child_care</span>
+            <p className="text-slate-500 dark:text-slate-400 font-semibold">등록된 아이가 없습니다</p>
+            <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">아이를 등록하고 버스를 배정해주세요</p>
           </div>
         ) : (
           <div className="space-y-4">
             {children.map(child => (
-              <div key={child.id} className="bg-slate-50 rounded-2xl p-5 md:p-6 border border-slate-100 flex items-center gap-4 md:gap-6 hover:border-slate-200 transition-all">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-navy text-white rounded-2xl flex items-center justify-center text-xl md:text-2xl font-black shadow-md flex-shrink-0">
+              <div key={child.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-700 flex items-center gap-4 md:gap-6 hover:border-slate-200 dark:hover:border-slate-600 transition-all">
+                <div className="w-14 h-14 md:w-16 md:h-16 bg-navy dark:bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl md:text-2xl font-black shadow-md flex-shrink-0">
                   {child.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <h4 className="text-lg md:text-xl font-extrabold text-navy">{child.name}</h4>
-                    <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{child.age}세</span>
+                    <h4 className="text-lg md:text-xl font-extrabold text-navy dark:text-blue-400">{child.name}</h4>
+                    <span className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded text-xs font-bold">{child.age}세</span>
                     {child.boarding_status && (
                       <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                         child.boarding_status === '승차' 
-                          ? 'bg-emerald-50 text-safe-green border border-emerald-100' 
-                          : 'bg-slate-100 text-slate-500 border border-slate-200'
+                          ? 'bg-emerald-50 dark:bg-emerald-900/30 text-safe-green dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' 
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600'
                       }`}>
                         {child.boarding_status}
                       </span>
                     )}
                   </div>
-                  <p className="text-slate-500 font-medium text-sm truncate">
+                  <p className="text-slate-500 dark:text-slate-400 font-medium text-sm truncate">
                     {child.bus_number ? `${child.bus_number}호 버스` : '버스 미배정'}
                     {child.stop_name && ` · ${child.stop_name}`}
                   </p>
                   {/* ETA 표시 - 승차 중일 때만 */}
                   {child.boarding_status === '승차' && etaData[child.id]?.eta && (
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-base text-amber-500">schedule</span>
-                      <span className="text-amber-600 font-bold text-sm">
+                      <span className="material-symbols-outlined text-base text-amber-500 dark:text-amber-400">schedule</span>
+                      <span className="text-amber-600 dark:text-amber-400 font-bold text-sm">
                         약 {etaData[child.id].eta}분 후 도착 예정
                       </span>
-                      <span className="text-slate-400 text-xs">
+                      <span className="text-slate-400 dark:text-slate-500 text-xs">
                         ({(etaData[child.id].distance / 1000).toFixed(1)}km)
                       </span>
                     </div>
@@ -336,42 +336,42 @@ function ParentDashboard() {
       {/* 아이 등록 모달 */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 md:p-8 w-full max-w-md shadow-2xl">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-extrabold text-navy">아이 등록</h3>
+              <h3 className="text-xl font-extrabold text-navy dark:text-blue-400">아이 등록</h3>
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center transition-colors"
               >
-                <span className="material-symbols-outlined text-slate-500">close</span>
+                <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
               </button>
             </div>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">아이 이름</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">아이 이름</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none transition-all font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
                   placeholder="이름을 입력하세요"
                   value={childForm.name}
                   onChange={(e) => setChildForm({ ...childForm, name: e.target.value })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">나이</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">나이</label>
                 <input
                   type="number"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none transition-all font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
                   placeholder="나이를 입력하세요"
                   value={childForm.age}
                   onChange={(e) => setChildForm({ ...childForm, age: e.target.value })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">버스 선택</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">버스 선택</label>
                 <select
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none transition-all font-medium bg-white"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
                   value={childForm.busId}
                   onChange={(e) => setChildForm({ ...childForm, busId: e.target.value })}
                 >
@@ -382,9 +382,9 @@ function ParentDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">정류장 선택</label>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">정류장 선택</label>
                 <select
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-navy focus:ring-2 focus:ring-navy/10 outline-none transition-all font-medium bg-white"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
                   value={childForm.stopId}
                   onChange={(e) => setChildForm({ ...childForm, stopId: e.target.value })}
                   disabled={!childForm.busId}
@@ -400,13 +400,13 @@ function ParentDashboard() {
             <div className="flex gap-3 mt-8">
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all"
+                className="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
               >
                 취소
               </button>
               <button 
                 onClick={handleAddChild}
-                className="flex-1 py-3 rounded-xl font-bold text-white bg-navy hover:bg-navy-dark transition-all shadow-md shadow-navy/10"
+                className="flex-1 py-3 rounded-xl font-bold text-white bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 transition-all shadow-md shadow-navy/10 dark:shadow-blue-600/10"
               >
                 등록하기
               </button>
