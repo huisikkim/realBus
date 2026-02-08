@@ -214,182 +214,230 @@ function ParentDashboard() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
-      {/* 버스 위치 섹션 */}
-      <section className="bg-white dark:bg-slate-800 rounded-large shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <div className="p-6 md:p-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">실시간 버스 위치</h2>
-              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">우리 아이가 탑승한 버스의 현재 위치입니다.</p>
-            </div>
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold flex-shrink-0 ${
-              connected ? 'bg-emerald-50 dark:bg-emerald-900/30 text-safe-green dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-            }`}>
-              <span className={`w-2 h-2 rounded-full ${connected ? 'bg-safe-green dark:bg-emerald-400 animate-pulse' : 'bg-slate-400'}`}></span>
-              {connected ? '연결' : '연결 중'}
-            </div>
-          </div>
-
-          <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner">
-            {busLocation && children.some(c => c.boarding_status === '승차') ? (
-              <>
-                <KakaoMap latitude={busLocation.latitude} longitude={busLocation.longitude} />
-                <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 bg-safe-green dark:bg-emerald-400 rounded-full animate-pulse"></span>
-                    <span className="text-sm font-bold text-navy dark:text-blue-400">속도: {busLocation.speed || 0} km/h</span>
+    <main className="max-w-2xl mx-auto p-4 md:p-6 space-y-4 pb-20">
+      {/* 버스 위치 섹션 - 인스타 스토리 스타일 */}
+      <section className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg overflow-hidden border-0">
+        <div className="relative w-full aspect-[4/3] max-h-[400px]">
+          {busLocation && children.some(c => c.boarding_status === '승차') ? (
+            <>
+              <KakaoMap latitude={busLocation.latitude} longitude={busLocation.longitude} />
+              {/* 상단 그라데이션 오버레이 */}
+              <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/50 to-transparent"></div>
+              {/* 하단 그라데이션 오버레이 */}
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/50 to-transparent"></div>
+              
+              {/* 상단 정보 */}
+              <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-500 to-orange-400 p-0.5">
+                    <div className="w-full h-full rounded-full bg-white dark:bg-slate-800 flex items-center justify-center">
+                      <span className="text-base">🚌</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-white font-bold text-xs drop-shadow-lg">실시간 위치</p>
+                    <p className="text-white/80 text-[10px] drop-shadow-lg">지금 운행 중</p>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div className="w-full h-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
-                <div className="text-center">
-                  <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">location_off</span>
-                  <p className="text-slate-500 dark:text-slate-400 font-semibold">
-                    {children.length === 0 
-                      ? '등록된 아이가 없습니다'
-                      : children.some(c => c.bus_id) 
-                        ? '아이가 버스에 탑승하지 않았습니다'
-                        : '버스가 배정되지 않았습니다'
-                    }
-                  </p>
-                  <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
-                    {children.some(c => c.bus_id) 
-                      ? '아이가 탑승하면 실시간 위치가 표시됩니다'
-                      : '아이에게 버스를 배정해주세요'
-                    }
-                  </p>
+                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-md ${
+                  connected ? 'bg-emerald-500/90' : 'bg-slate-500/90'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full bg-white ${connected ? 'animate-pulse' : ''}`}></span>
+                  <span className="text-white text-[10px] font-bold">LIVE</span>
                 </div>
               </div>
-            )}
-          </div>
+
+              {/* 하단 정보 */}
+              <div className="absolute bottom-3 left-3 right-3">
+                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-xl p-3 shadow-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-emerald-500 text-lg">speed</span>
+                      <span className="text-slate-900 dark:text-white font-bold text-sm">{busLocation.speed || 0} km/h</span>
+                    </div>
+                    <span className="text-slate-500 dark:text-slate-400 text-[10px]">실시간 추적 중</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+              <div className="text-center px-6">
+                <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center shadow-lg">
+                  <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">location_off</span>
+                </div>
+                <p className="text-slate-600 dark:text-slate-300 font-bold text-base mb-1">
+                  {children.length === 0 
+                    ? '아이를 등록해주세요'
+                    : children.some(c => c.bus_id) 
+                      ? '탑승 대기 중'
+                      : '버스 배정 필요'
+                  }
+                </p>
+                <p className="text-slate-400 dark:text-slate-500 text-xs">
+                  {children.some(c => c.bus_id) 
+                    ? '탑승하면 실시간으로 위치를 확인할 수 있어요'
+                    : '아이에게 버스를 배정해주세요'
+                  }
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* 내 아이 섹션 */}
-      <section className="bg-white dark:bg-slate-800 rounded-large shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div>
-            <h3 className="text-xl md:text-2xl font-extrabold text-navy dark:text-blue-400">내 아이</h3>
-            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">등록된 아이의 탑승 상태를 확인하세요.</p>
-          </div>
+      {/* 내 아이 섹션 - 인스타 피드 스타일 */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">내 아이</h3>
           <button 
             onClick={() => setShowAddModal(true)}
-            className="bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-md shadow-navy/10 dark:shadow-blue-600/10"
+            className="flex items-center gap-1.5 text-blue-500 dark:text-blue-400 font-bold text-sm hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
           >
-            <span className="material-symbols-outlined text-lg">add</span>
-            아이 등록
+            <span className="material-symbols-outlined text-xl">add_circle</span>
+            <span>추가</span>
           </button>
         </div>
 
         {children.length === 0 ? (
-          <div className="text-center py-12">
-            <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-3">child_care</span>
-            <p className="text-slate-500 dark:text-slate-400 font-semibold">등록된 아이가 없습니다</p>
-            <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">아이를 등록하고 버스를 배정해주세요</p>
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-12 text-center">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-100 to-orange-100 dark:from-pink-900/30 dark:to-orange-900/30 flex items-center justify-center">
+              <span className="material-symbols-outlined text-5xl text-pink-400 dark:text-pink-500">child_care</span>
+            </div>
+            <p className="text-slate-600 dark:text-slate-300 font-bold mb-2">아직 등록된 아이가 없어요</p>
+            <p className="text-slate-400 dark:text-slate-500 text-sm">아이를 등록하고 버스를 배정해보세요</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {children.map(child => (
-              <div key={child.id} className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-700 flex items-center gap-4 md:gap-6 hover:border-slate-200 dark:hover:border-slate-600 transition-all">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-navy dark:bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl md:text-2xl font-black shadow-md flex-shrink-0">
-                  {child.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <h4 className="text-lg md:text-xl font-extrabold text-navy dark:text-blue-400">{child.name}</h4>
-                    <span className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded text-xs font-bold">{child.age}세</span>
-                    {child.boarding_status && (
-                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                        child.boarding_status === '승차' 
-                          ? 'bg-emerald-50 dark:bg-emerald-900/30 text-safe-green dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' 
-                          : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600'
-                      }`}>
-                        {child.boarding_status}
-                      </span>
+              <div key={child.id} className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg overflow-hidden">
+                {/* 카드 헤더 */}
+                <div className="p-4 flex items-center gap-3 border-b border-slate-100 dark:border-slate-700">
+                  <div className="relative">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-black shadow-lg ${
+                      child.boarding_status === '승차' 
+                        ? 'bg-gradient-to-br from-pink-500 to-orange-400' 
+                        : 'bg-gradient-to-br from-slate-400 to-slate-500'
+                    }`}>
+                      {child.name.charAt(0)}
+                    </div>
+                    {child.boarding_status === '승차' && (
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center">
+                        <span className="material-symbols-outlined text-white text-xs">check</span>
+                      </div>
                     )}
                   </div>
-                  <p className="text-slate-500 dark:text-slate-400 font-medium text-sm truncate">
-                    {child.bus_number ? `${child.bus_number}호 버스` : '버스 미배정'}
-                    {child.stop_name && ` · ${child.stop_name}`}
-                  </p>
-                  {/* ETA 표시 - 승차 중일 때만 */}
-                  {child.boarding_status === '승차' && etaData[child.id]?.eta && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-base text-amber-500 dark:text-amber-400">schedule</span>
-                      <span className="text-amber-600 dark:text-amber-400 font-bold text-sm">
-                        약 {etaData[child.id].eta}분 후 도착 예정
-                      </span>
-                      <span className="text-slate-400 dark:text-slate-500 text-xs">
-                        ({(etaData[child.id].distance / 1000).toFixed(1)}km)
-                      </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-base font-bold text-slate-900 dark:text-white">{child.name}</h4>
+                      <span className="text-slate-400 dark:text-slate-500 text-xs">·</span>
+                      <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">{child.age}세</span>
                     </div>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs truncate">
+                      {child.bus_number ? `${child.bus_number}호 버스` : '버스 미배정'}
+                    </p>
+                  </div>
+                  {child.boarding_status && (
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      child.boarding_status === '승차' 
+                        ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' 
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                    }`}>
+                      {child.boarding_status}
+                    </span>
                   )}
                 </div>
+
+                {/* 카드 본문 */}
+                {child.stop_name && (
+                  <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900/50">
+                    <div className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg mt-0.5">location_on</span>
+                      <div className="flex-1">
+                        <p className="text-slate-600 dark:text-slate-300 text-sm font-medium">{child.stop_name}</p>
+                        {/* ETA 표시 - 승차 중일 때만 */}
+                        {child.boarding_status === '승차' && etaData[child.id]?.eta && (
+                          <div className="mt-2 flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl px-3 py-2">
+                            <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-lg">schedule</span>
+                            <div>
+                              <p className="text-amber-600 dark:text-amber-400 font-bold text-sm">
+                                약 {etaData[child.id].eta}분 후 도착
+                              </p>
+                              <p className="text-amber-500/70 dark:text-amber-400/70 text-xs">
+                                {(etaData[child.id].distance / 1000).toFixed(1)}km 남음
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
       </section>
 
-      {/* 아이 등록 모달 */}
+      {/* 아이 등록 모달 - 인스타 스타일 */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-extrabold text-navy dark:text-blue-400">아이 등록</h3>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-end md:items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-t-3xl md:rounded-3xl w-full md:max-w-md shadow-2xl animate-slide-up md:animate-none">
+            {/* 모달 헤더 */}
+            <div className="relative p-4 border-b border-slate-200 dark:border-slate-700">
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
               >
                 <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
               </button>
+              <h3 className="text-center text-base font-bold text-slate-900 dark:text-white">새 아이 등록</h3>
             </div>
             
-            <div className="space-y-4">
+            {/* 모달 본문 */}
+            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
               <div>
-                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">아이 이름</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">아이 이름</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 outline-none transition-all font-medium"
                   placeholder="이름을 입력하세요"
                   value={childForm.name}
                   onChange={(e) => setChildForm({ ...childForm, name: e.target.value })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">나이</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">나이</label>
                 <input
                   type="number"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 outline-none transition-all font-medium"
                   placeholder="나이를 입력하세요"
                   value={childForm.age}
                   onChange={(e) => setChildForm({ ...childForm, age: e.target.value })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">버스 선택</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">버스 선택</label>
                 <select
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 outline-none transition-all font-medium"
                   value={childForm.busId}
                   onChange={(e) => setChildForm({ ...childForm, busId: e.target.value })}
                 >
-                  <option value="">버스를 선택하세요 (선택사항)</option>
+                  <option value="">선택 안 함 (나중에 배정)</option>
                   {buses.map(bus => (
                     <option key={bus.id} value={bus.id}>{bus.bus_number}호 버스</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">정류장 선택</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">정류장 선택</label>
                 <select
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-navy dark:focus:border-blue-400 focus:ring-2 focus:ring-navy/10 dark:focus:ring-blue-400/10 outline-none transition-all font-medium"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 outline-none transition-all font-medium disabled:opacity-50"
                   value={childForm.stopId}
                   onChange={(e) => setChildForm({ ...childForm, stopId: e.target.value })}
                   disabled={!childForm.busId}
                 >
-                  <option value="">{childForm.busId ? '정류장을 선택하세요' : '버스를 먼저 선택하세요'}</option>
+                  <option value="">{childForm.busId ? '선택 안 함' : '버스를 먼저 선택하세요'}</option>
                   {stops.map(stop => (
                     <option key={stop.id} value={stop.id}>{stop.name}</option>
                   ))}
@@ -397,16 +445,11 @@ function ParentDashboard() {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-8">
-              <button 
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
-              >
-                취소
-              </button>
+            {/* 모달 푸터 */}
+            <div className="p-4 border-t border-slate-200 dark:border-slate-700">
               <button 
                 onClick={handleAddChild}
-                className="flex-1 py-3 rounded-xl font-bold text-white bg-navy dark:bg-blue-600 hover:bg-navy-dark dark:hover:bg-blue-700 transition-all shadow-md shadow-navy/10 dark:shadow-blue-600/10"
+                className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30"
               >
                 등록하기
               </button>

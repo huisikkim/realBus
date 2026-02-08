@@ -18,12 +18,17 @@ function Layout({ children }) {
     <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors">
       <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-8 py-4 md:py-5 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-2 md:gap-4 min-w-0">
-          <div className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg flex-shrink-0">
-            <span className="text-xl md:text-2xl">🚌</span>
+          <div className="relative flex-shrink-0">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-400 to-amber-500 flex items-center justify-center shadow-lg">
+              <span className="text-xl md:text-2xl">🚌</span>
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center shadow-md">
+              <span className="text-white text-[10px] font-black">K</span>
+            </div>
           </div>
           <div className="min-w-0">
-            <h1 className="text-base md:text-2xl font-extrabold text-navy dark:text-blue-400 tracking-tight whitespace-nowrap">셔틀버스 안전</h1>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden md:block">Safe Transportation Monitoring</p>
+            <h1 className="text-base md:text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap">셔틀버스 안전</h1>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden md:block">Kids Safe Transportation</p>
           </div>
         </div>
         
