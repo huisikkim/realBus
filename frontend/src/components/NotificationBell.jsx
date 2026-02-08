@@ -121,10 +121,16 @@ function NotificationBell() {
             onClick={() => setShowDropdown(false)}
           />
           
-          <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-[500px] overflow-hidden flex flex-col">
+          {/* 모바일: 전체 화면, 데스크톱: 드롭다운 */}
+          <div className="fixed md:absolute left-0 right-0 md:left-auto md:right-0 bottom-0 md:bottom-auto md:top-full mt-0 md:mt-2 w-full md:w-96 bg-white md:rounded-xl rounded-t-3xl md:rounded-t-xl shadow-2xl border-t md:border border-slate-200 z-50 max-h-[80vh] md:max-h-[500px] overflow-hidden flex flex-col">
+            {/* 모바일 핸들 */}
+            <div className="md:hidden flex justify-center py-2 border-b border-slate-200">
+              <div className="w-12 h-1 bg-slate-300 rounded-full"></div>
+            </div>
+
             {/* 헤더 */}
             <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="font-bold text-navy">알림</h3>
+              <h3 className="font-bold text-navy text-lg">알림</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
