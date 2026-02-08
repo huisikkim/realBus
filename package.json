@@ -6,6 +6,8 @@
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
     "build:frontend": "cd frontend && npm run build",
+    "copy:frontend": "cp -r frontend/dist/* backend/public/",
+    "deploy:prepare": "npm run build:frontend && npm run copy:frontend",
     "build": "npm run install:backend && npm run install:frontend && npm run build:frontend",
     "start": "cd backend && npm start"
   },
