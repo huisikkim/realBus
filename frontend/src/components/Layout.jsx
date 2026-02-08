@@ -32,7 +32,7 @@ function Layout({ children }) {
           </div>
         </div>
         
-        <div className="flex items-center gap-2 md:gap-8 flex-shrink-0">
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
           {/* 알림 벨 (부모만) */}
           {user?.role === 'parent' && <NotificationBell />}
           
@@ -53,15 +53,6 @@ function Layout({ children }) {
             </div>
           </button>
           
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-navy dark:text-blue-400">{user?.name}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">{getRoleLabel()}</p>
-            </div>
-            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-600 shadow-sm overflow-hidden flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-slate-400 dark:text-slate-500">person</span>
-            </div>
-          </div>
           <button 
             onClick={logout}
             className="text-slate-500 dark:text-slate-400 hover:text-navy dark:hover:text-blue-400 text-xs md:text-sm font-bold transition-colors border border-slate-200 dark:border-slate-600 px-2 md:px-4 py-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-700 whitespace-nowrap"
