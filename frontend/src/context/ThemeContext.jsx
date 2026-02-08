@@ -5,7 +5,11 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
-    return saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // 저장된 값이 없으면 기본값은 다크 테마
+    if (saved) {
+      return saved === 'dark';
+    }
+    return true; // 기본값: 다크 테마
   });
 
   useEffect(() => {
