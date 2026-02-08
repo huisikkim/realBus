@@ -244,16 +244,16 @@ function ParentDashboard() {
       {/* 버스 위치 섹션 */}
       <section className="bg-white rounded-large shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 md:p-8">
-          <div className="flex justify-between items-center mb-6">
-            <div>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+            <div className="flex-1 min-w-0">
               <h2 className="text-xl md:text-2xl font-extrabold text-navy">실시간 버스 위치</h2>
               <p className="text-slate-500 font-medium text-sm">우리 아이가 탑승한 버스의 현재 위치입니다.</p>
             </div>
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold flex-shrink-0 ${
               connected ? 'bg-emerald-50 text-safe-green' : 'bg-slate-100 text-slate-500'
             }`}>
               <span className={`w-2 h-2 rounded-full ${connected ? 'bg-safe-green animate-pulse' : 'bg-slate-400'}`}></span>
-              {connected ? '연결됨' : '연결 중...'}
+              {connected ? '연결' : '연결 중'}
             </div>
           </div>
 
