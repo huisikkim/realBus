@@ -3,7 +3,8 @@ import { io } from 'socket.io-client';
 
 const SocketContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// 프로덕션에서는 같은 서버 사용 (상대 경로)
+const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
