@@ -22,8 +22,15 @@ const corsOptions = {
   credentials: true
 };
 
+console.log('CORS 설정:', corsOptions);
+
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// 헬스 체크 (가장 먼저)
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Socket.io 설정
 const io = new Server(server, {
@@ -58,13 +65,10 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// 헬스 체크
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+  console.log(`환경: ${process.env.NODE_ENV}`);
+  console.log(`프론트엔드 URL: ${process.env.FRONTEND_URL}`);
 });
