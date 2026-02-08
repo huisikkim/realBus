@@ -54,7 +54,7 @@ function BusInfoCard({ bus, isRunning, connected, currentLocation, currentPassen
           {currentLocation && (
             <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm px-3 py-2 rounded-lg text-xs font-bold border border-slate-200 dark:border-slate-600 shadow-sm flex items-center gap-2">
               <span className="w-2 h-2 bg-safe-green dark:bg-emerald-400 rounded-full animate-pulse"></span>
-              <span className="text-slate-700 dark:text-slate-300">GPS Active | Kakao Map</span>
+              <span className="text-slate-700 dark:text-slate-300">실시간 추적 중</span>
             </div>
           )}
         </div>
