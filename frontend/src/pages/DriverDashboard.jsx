@@ -9,6 +9,7 @@ function DriverDashboard() {
   const [isRunning, setIsRunning] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [hiddenButtons, setHiddenButtons] = useState({}); // 버튼 숨김 상태 관리
+  const [currentPassengers, setCurrentPassengers] = useState(0); // 현재 탑승 인원 추적
   const { socket, connected } = useSocket();
   const watchIdRef = useRef(null);
   const lastUpdateTimeRef = useRef(0); // 마지막 업데이트 시간 추적
@@ -192,6 +193,8 @@ function DriverDashboard() {
     // 상태 초기화
     lastValidLocationRef.current = null;
     gpsErrorCountRef.current = 0;
+    setCurrentPassengers(0); // 탑승 인원 초기화
+    setHiddenButtons({}); // 버튼 상태 초기화
 
     socket.emit('driver:endTrip', { busId: bus.id });
     setIsRunning(false);
@@ -215,12 +218,16 @@ function DriverDashboard() {
       alert('승차 처리되었습니다.');
       // 승차 버튼 숨기기
       setHiddenButtons(prev => ({ ...prev, [`${childId}-board`]: true }));
+      // 탑승 인원 증가
+      setCurrentPassengers(prev => prev + 1);
     } else {
       console.log('하차 처리:', childId, bus.id);
       socket.emit('driver:childAlighted', { childId, busId: bus.id });
       alert('하차 처리되었습니다.');
       // 하차 버튼 숨기기
       setHiddenButtons(prev => ({ ...prev, [`${childId}-alight`]: true }));
+      // 탑승 인원 감소
+      setCurrentPassengers(prev => Math.max(0, prev - 1));
     }
   };
 
@@ -263,7 +270,7 @@ function DriverDashboard() {
                   {connected ? '서버 연결됨' : '서버 연결 안됨'}
                 </span>
               </div>
-              <p className="text-slate-500 font-semibold text-sm">최대 정원: {bus.capacity}명 | 현재 탑승: {children.length}명</p>
+              <p className="text-slate-500 font-semibold text-sm">최대 정원: {bus.capacity}명 | 현재 탑승: {currentPassengers}명</p>
             </div>
             <div className="text-left md:text-right">
               <p className="text-slate-400 text-xs font-bold mb-1 uppercase tracking-widest">현재 속도</p>
