@@ -25,7 +25,6 @@ export function AuthProvider({ children }) {
     
     // 소켓 재연결 트리거
     if (window.reconnectSocket) {
-      console.log('로그인 완료 - 소켓 재연결 시도');
       setTimeout(() => window.reconnectSocket(), 100);
     }
     

@@ -67,40 +67,26 @@ function ParentDashboard() {
 
     // 소켓 이벤트 리스너 등록
     const handleLocationUpdate = (data) => {
-      console.log('위치 업데이트 수신:', data);
-      // 위치 업데이트는 항상 받아서 저장 (버스 구독이 되어있다면)
       setBusLocation(data);
     };
 
     const handleTripStarted = (data) => {
-      console.log('운행 시작:', data);
       loadChildren();
     };
 
     const handleTripEnded = (data) => {
-      console.log('운행 종료:', data);
       setBusLocation(null);
       loadChildren();
     };
 
     const handleChildBoarded = async (data) => {
-      console.log('=== 승차 이벤트 수신 ===', data);
-      
       // 내 아이인지 확인
       if (data.parentId === user?.id) {
-        console.log(`내 아이(${data.childName}) 승차 확인`);
-        
-        // 알림 표시
         alert(`${data.childName}이(가) 버스에 탑승했습니다.`);
         
-        // 아이 정보를 다시 로드하여 최신 상태 가져오기
         try {
           const res = await api.get('/child/my');
-          const updatedChildren = res.data;
-          console.log('업데이트된 아이 목록:', updatedChildren.map(c => ({ id: c.id, name: c.name, status: c.boarding_status })));
-          setChildren(updatedChildren);
-          
-          // 버스 구독은 useEffect에서 자동으로 처리됨
+          setChildren(res.data);
         } catch (err) {
           console.error('아이 정보 로드 실패:', err);
           loadChildren();
@@ -109,14 +95,10 @@ function ParentDashboard() {
     };
 
     const handleChildAlighted = async (data) => {
-      console.log('하차 이벤트 수신:', data);
-      
       // 내 아이가 하차한 경우
       if (data.parentId === user?.id) {
-        console.log('내 아이 하차 - 위치 공유 중단');
         setBusLocation(null);
         
-        // 아이 정보를 다시 로드
         try {
           const res = await api.get('/child/my');
           const updatedChildren = res.data;
@@ -165,27 +147,19 @@ function ParentDashboard() {
     const boardedChildren = children.filter(c => c.bus_id && c.boarding_status === '승차');
     const busIds = [...new Set(boardedChildren.map(c => c.bus_id))];
     
-    console.log('=== 버스 구독 상태 ===');
-    console.log('전체 아이 목록:', children.map(c => ({ id: c.id, name: c.name, busId: c.bus_id, status: c.boarding_status })));
-    console.log('승차 중인 아이:', boardedChildren.map(c => ({ id: c.id, name: c.name, busId: c.bus_id })));
-    console.log('구독할 버스 ID:', busIds);
-    
     // 승차 중인 아이가 없으면 위치 공유 중단
     if (busIds.length === 0) {
-      console.log('승차 중인 아이 없음 - 위치 공유 안함');
       setBusLocation(null);
       return;
     }
     
     // 버스 구독 (각 버스마다)
     busIds.forEach(busId => {
-      console.log(`버스 ${busId} 구독 요청 전송`);
       socket.emit('parent:subscribeBus', { busId });
     });
 
     // cleanup: 구독 해제
     return () => {
-      console.log('버스 구독 해제:', busIds);
       busIds.forEach(busId => {
         socket.emit('parent:unsubscribeBus', { busId });
       });

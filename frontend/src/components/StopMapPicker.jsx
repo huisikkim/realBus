@@ -19,7 +19,6 @@ function StopMapPicker({ latitude, longitude, onSelect }) {
           });
         },
         (error) => {
-          console.log('위치 권한 거부, 기본 위치 사용');
           setCurrentPosition({ lat: 37.5665, lng: 126.9780 }); // 서울 시청
         }
       );

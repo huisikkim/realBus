@@ -22,8 +22,6 @@ export function useDriverLocation(socket, bus) {
       return false;
     }
 
-    console.log('위치 추적 시작 - 버스 ID:', bus.id);
-
     watchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
         const now = Date.now();
@@ -51,8 +49,6 @@ export function useDriverLocation(socket, bus) {
           speed: position.coords.speed ? Math.round(position.coords.speed * 3.6) : 0
         };
 
-        console.log('위치 업데이트:', locationData, `정확도: ${accuracy}m`);
-
         lastValidLocationRef.current = locationData;
         setCurrentLocation(locationData);
         socket.emit('driver:updateLocation', locationData);
@@ -79,10 +75,7 @@ export function useDriverLocation(socket, bus) {
         }
 
         if (lastValidLocationRef.current) {
-          console.log('마지막 유효한 위치 사용:', lastValidLocationRef.current);
           setCurrentLocation(lastValidLocationRef.current);
-        } else {
-          console.warn('유효한 위치 없음 - 위치 업데이트 대기 중');
         }
       },
       {

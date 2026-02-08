@@ -25,7 +25,6 @@ export function useDriverSocket(socket, bus) {
       return false;
     }
 
-    console.log('운행 시작 이벤트 전송');
     socket.emit('driver:startTrip', { busId: bus.id });
     return true;
   };
@@ -36,7 +35,6 @@ export function useDriverSocket(socket, bus) {
       return false;
     }
 
-    console.log('운행 종료 - 버스 ID:', bus.id);
     socket.emit('driver:endTrip', { busId: bus.id });
     return true;
   };
@@ -48,10 +46,8 @@ export function useDriverSocket(socket, bus) {
     }
 
     if (type === 'board') {
-      console.log('승차 처리:', childId, bus.id);
       socket.emit('driver:childBoarded', { childId, busId: bus.id });
     } else {
-      console.log('하차 처리:', childId, bus.id);
       socket.emit('driver:childAlighted', { childId, busId: bus.id });
     }
 
