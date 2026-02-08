@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#4F46E5" rx="80"/>
+  <g fill="#ffffff">
+    <!-- 버스 본체 -->
+    <rect x="120" y="180" width="272" height="200" rx="20"/>
+    <!-- 창문 -->
+    <rect x="140" y="200" width="80" height="60" rx="8" fill="#4F46E5"/>
+    <rect x="240" y="200" width="80" height="60" rx="8" fill="#4F46E5"/>
+    <!-- 바퀴 -->
+    <circle cx="170" cy="400" r="30" fill="#4F46E5"/>
+    <circle cx="342" cy="400" r="30" fill="#4F46E5"/>
+    <!-- 헤드라이트 -->
+    <circle cx="140" cy="350" r="12" fill="#FCD34D"/>
+    <circle cx="372" cy="350" r="12" fill="#FCD34D"/>
+    <!-- 안전 표시 -->
+    <path d="M 256 100 L 280 140 L 232 140 Z" fill="#FCD34D"/>
+    <rect x="246" y="140" width="20" height="30" fill="#FCD34D"/>
+  </g>
+</svg>

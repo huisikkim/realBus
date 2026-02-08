@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#4F46E5" />
+    <meta name="description" content="실시간 어린이 셔틀버스 위치 추적 서비스" />
+    
+    <!-- PWA 설정 -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="셔틀버스" />
+    
+    <title>셔틀버스 안전 서비스</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: { DEFAULT: "#2563EB", light: "#3B82F6", dark: "#1E40AF" },
+              "safe-green": "#059669",
+              "action-red": "#E11D48",
+            },
+            fontFamily: {
+              sans: ["Pretendard", "sans-serif"],
+            },
+            borderRadius: {
+              large: "1.25rem",
+            },
+          },
+        },
+      };
+    </script>
+    <script type="module" crossorigin src="/assets/index-Cr5uaknh.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-1FsHy9Em.css">
+  <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
+  <body class="bg-slate-50 text-navy font-sans antialiased min-h-screen">
+    <div id="root"></div>
+  </body>
+</html>
