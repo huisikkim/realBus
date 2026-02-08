@@ -58,7 +58,7 @@ function BusLocationCard({ busLocation, connected, children }) {
         <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
           <div className="text-center px-6">
             <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center shadow-lg">
-              <span className="text-4xl">📍</span>
+              <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">location_off</span>
             </div>
             <p className="text-slate-600 dark:text-slate-300 font-bold text-base mb-1">
               {children.length === 0 

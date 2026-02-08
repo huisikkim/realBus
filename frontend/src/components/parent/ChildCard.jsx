@@ -52,7 +52,7 @@ function ChildCard({ child, etaData }) {
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900/50 dark:to-slate-800/50 rounded-2xl p-3 border border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-start gap-2 mb-2">
               <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-sm">📍</span>
+                <span className="material-symbols-outlined text-white text-sm">location_on</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-slate-600 dark:text-slate-300 text-sm font-bold">{child.stop_name}</p>
